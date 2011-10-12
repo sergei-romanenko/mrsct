@@ -35,7 +35,7 @@ trait PFPSyntax[C] {
   val subclass: PartialOrdering[C]
 }
 
-trait PFPSemantics[C] {
+trait PFPSemantics[C] { this: DriveSteps[C] =>
   def driveConf(c: C): DriveStep[C]
 }
 

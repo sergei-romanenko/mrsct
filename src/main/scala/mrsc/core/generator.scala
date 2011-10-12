@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 
 trait Transformer[C, D] {
   type G = SGraph[C, D]
-  type S = GraphStep[C, D]
+  type S = G => G
   def descendants(g: G): List[G]
 }
 
@@ -32,12 +32,7 @@ case class GraphGenerator[C, D](transformer: Transformer[C, D], conf: C)
      */
 
   private val completeGs: Queue[SGraph[C, D]] = Queue()
-  private var gs: List[SGraph[C, D]] = List(initial(conf))
-
-  private def initial(c: C): SGraph[C, D] = {
-    val initialNode = SNode[C, D](c, null, None, Nil)
-    SGraph(List(initialNode), Nil, Nil)
-  }
+  private var gs: List[SGraph[C, D]] = List(SGraph.initial[C, D](conf))
 
   private def normalize(): Unit =
     while (completeGs.isEmpty && !gs.isEmpty) {

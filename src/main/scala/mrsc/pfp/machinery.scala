@@ -2,7 +2,8 @@ package mrsc.pfp
 
 import mrsc.core._
 
-trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]] {
+trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]]
+  with GraphBuilder[C, DriveInfo[C]] with DriveSteps[C] {
 
   type N = SNode[C, DriveInfo[C]]
   type Warning
@@ -14,7 +15,7 @@ trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]] {
   override def descendants(g: G): List[G] =
     findBase(g) match {
       case Some(node) =>
-        List(FoldStep(node)(g))
+        List(foldStep(node)(g))
       case _ =>
         val whistle = inspect(g)
         val driveSteps = if (whistle.isEmpty) drive(g) else List()
@@ -23,8 +24,8 @@ trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]] {
     }
 }
 
-trait Driving[C] extends PFPTransformer[C] with PFPSemantics[C] {
-  override def drive(g: G): List[S] = List(driveConf(g.current.conf).graphStep)
+trait Driving[C] extends PFPTransformer[C] { this: PFPSemantics[C] =>
+  def drive(g: G): List[S] = List(driveConf(g.current.conf))
 }
 
 trait RenamingFolding[C] extends PFPTransformer[C] with PFPSyntax[C] {
@@ -48,7 +49,7 @@ trait UnaryWhistle[C] extends PFPTransformer[C] {
 
 trait AllRebuildings[C] extends PFPTransformer[C] with PFPSyntax[C] {
   override def rebuildings(whistle: Option[Warning], g: G): List[S] = {
-    rebuildings(g.current.conf) map { RebuildStep(_): S }
+    rebuildings(g.current.conf) map { rebuildStep(_): S }
   }
 }
 
@@ -56,7 +57,7 @@ trait LowerRebuildingsOnBinaryWhistle[C] extends PFPTransformer[C] with PFPSynta
   override def rebuildings(whistle: Option[Warning], g: G): List[S] =
     whistle match {
       case None => List()
-      case Some(_) => rebuildings(g.current.conf) map { RebuildStep(_): S }
+      case Some(_) => rebuildings(g.current.conf) map { rebuildStep(_): S }
     }
 }
 
@@ -64,7 +65,7 @@ trait UpperRebuildingsOnBinaryWhistle[C] extends PFPTransformer[C] with PFPSynta
   override def rebuildings(whistle: Option[Warning], g: G): List[S] =
     whistle match {
       case None => List()
-      case Some(upper) => rebuildings(upper.conf) map { RollbackStep(upper, _) }
+      case Some(upper) => rebuildings(upper.conf) map { rollbackStep(upper, _) }
     }
 }
 
@@ -75,9 +76,9 @@ trait DoubleRebuildingsOnBinaryWhistle[C] extends PFPTransformer[C] with PFPSynt
         List()
       case Some(upper) =>
         val rebuilds: List[S] =
-          rebuildings(g.current.conf) map { RebuildStep(_): S }
+          rebuildings(g.current.conf) map { rebuildStep(_): S }
         val rollbacks: List[S] =
-          rebuildings(upper.conf) map { RollbackStep(upper, _) }
+          rebuildings(upper.conf) map { rollbackStep(upper, _) }
         rollbacks ++ rebuilds
     }
 }
@@ -87,7 +88,7 @@ trait LowerAllBinaryGensOnBinaryWhistle[C] extends PFPTransformer[C] with Mutual
     whistle match {
       case None => List()
       case Some(upper) =>
-        mutualGens(g.current.conf, upper.conf) map translate map { RebuildStep(_): S }
+        mutualGens(g.current.conf, upper.conf) map translate map { rebuildStep(_): S }
     }
 }
 
@@ -96,7 +97,7 @@ trait UpperAllBinaryGensOnBinaryWhistle[C] extends PFPTransformer[C] with Mutual
     whistle match {
       case None => List()
       case Some(upper) =>
-        mutualGens(upper.conf, g.current.conf) map translate map { RollbackStep(upper, _) }
+        mutualGens(upper.conf, g.current.conf) map translate map { rollbackStep(upper, _) }
     }
 }
 
@@ -106,8 +107,8 @@ trait DoubleAllBinaryGensOnBinaryWhistle[C] extends PFPTransformer[C] with Mutua
       case None =>
         List()
       case Some(upper) =>
-        val rollbacks: List[S] = mutualGens(upper.conf, g.current.conf) map translate map { RollbackStep(upper, _) }
-        val rebuilds: List[S] = mutualGens(g.current.conf, upper.conf) map translate map { RebuildStep(_): S }
+        val rollbacks: List[S] = mutualGens(upper.conf, g.current.conf) map translate map { rollbackStep(upper, _) }
+        val rebuilds: List[S] = mutualGens(g.current.conf, upper.conf) map translate map { rebuildStep(_): S }
         rollbacks ++ rebuilds
     }
 }
@@ -117,7 +118,7 @@ trait LowerAllBinaryGensOrDriveOnBinaryWhistle[C] extends PFPTransformer[C] with
     whistle match {
       case None => List()
       case Some(upper) =>
-        val rebuilds: List[S] = mutualGens(g.current.conf, upper.conf) map translate map { RebuildStep(_): S }
+        val rebuilds: List[S] = mutualGens(g.current.conf, upper.conf) map translate map { rebuildStep(_): S }
         if (rebuilds.isEmpty) {
           drive(g)
         } else {
@@ -131,7 +132,7 @@ trait UpperAllBinaryGensOrDriveOnBinaryWhistle[C] extends PFPTransformer[C] with
     whistle match {
       case None => List()
       case Some(upper) =>
-        val rollbacks = mutualGens(upper.conf, g.current.conf) map translate map { RollbackStep(upper, _) }
+        val rollbacks = mutualGens(upper.conf, g.current.conf) map translate map { rollbackStep(upper, _) }
         if (rollbacks.isEmpty) {
           drive(g)
         } else {
@@ -151,11 +152,11 @@ trait UpperMsgOrLowerMggOnBinaryWhistle[C]
         msg(upperConf, currentConf) match {
           case Some(rb) =>
             val conf1 = translate(rb)
-            List(RollbackStep(upper, conf1))
+            List(rollbackStep(upper, conf1))
           case None =>
             val cands = rawRebuildings(currentConf) filterNot trivialRb(currentConf)
             val mgg = cands find { case (c1, _) => cands forall { case (c2, _) => subclass.lteq(c2, c1) } }
-            mgg.map(translate).map(RebuildStep(_): S).toList
+            mgg.map(translate).map(rebuildStep(_): S).toList
         }
       case None =>
         List()
@@ -173,12 +174,12 @@ trait LowerMsgOrUpperMggOnBinaryWhistle[C] extends PFPTransformer[C] with MSG[C]
         msg(currentConf, upperConf) match {
           case Some(rb) =>
             val conf1 = translate(rb)
-            val replace = RebuildStep(conf1): S
+            val replace = rebuildStep(conf1): S
             List(replace)
           case None =>
             val cands = rawRebuildings(upperConf) filterNot trivialRb(upperConf)
             val mgg = cands find { case (c1, _) => cands forall { case (c2, _) => subclass.lteq(c2, c1) } }
-            mgg.map(translate).map(RollbackStep(upper, _)).toList
+            mgg.map(translate).map(rollbackStep(upper, _)).toList
         }
       case None =>
         List()
@@ -196,7 +197,7 @@ trait MSGCurrentOrDriving[C] extends PFPTransformer[C] with MSG[C] with BinaryWh
         msg(currentConf, upperConf) match {
           case Some(rb) =>
             val conf1 = translate(rb)
-            val replace: S = RebuildStep(conf1)
+            val replace: S = rebuildStep(conf1)
             List(replace)
           case None =>
             drive(g)
@@ -213,8 +214,8 @@ trait DoubleMsgOnBinaryWhistle[C] extends PFPTransformer[C] with MSG[C] with Bin
     whistle match {
       case Some(upper) =>
         val current = g.current
-        val rollbacks = msg(upper.conf, current.conf) map { rb => RollbackStep(upper, translate(rb)) }
-        val rebuildings = msg(current.conf, upper.conf) map { rb => RebuildStep(translate(rb)): S }
+        val rollbacks = msg(upper.conf, current.conf) map { rb => rollbackStep(upper, translate(rb)) }
+        val rebuildings = msg(current.conf, upper.conf) map { rb => rebuildStep(translate(rb)): S }
         rollbacks.toList ++ rebuildings.toList
       case None =>
         List()

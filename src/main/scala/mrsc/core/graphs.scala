@@ -68,9 +68,16 @@ case class SGraph[C, D](
   incompleteLeaves: List[SNode[C, D]],
   completeLeaves: List[SNode[C, D]],
   completeNodes: List[SNode[C, D]]) {
-  
+
   val isComplete = incompleteLeaves.isEmpty
   val current = if (isComplete) null else incompleteLeaves.head
+}
+
+object SGraph {
+  def initial[C, D](c: C): SGraph[C, D] = {
+    val initialNode = SNode[C, D](c, null, None, Nil)
+    SGraph(List(initialNode), Nil, Nil)
+  }
 }
 
 /*! `TNode[C, D, E]` is a very simple and straightforward implementation of
@@ -89,7 +96,7 @@ case class TNode[C, D](
     case Nil => this
     case i :: rp => outs(i).node.get(rp)
   }
-  
+
   override def toString = GraphPrettyPrinter.toString(this)
 }
 

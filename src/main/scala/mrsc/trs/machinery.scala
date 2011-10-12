@@ -3,7 +3,7 @@ package mrsc.trs
 import mrsc.core._
 
 trait GenericMultiTransformer[C, D]
-  extends Transformer[C, D] {
+  extends Transformer[C, D] with GraphBuilder[C, D] {
 
   type Warning = SNode[C, D]
   def unsafe(g: G): Boolean = false
@@ -25,7 +25,7 @@ trait GenericMultiTransformer[C, D]
       List()
     else findBase(g) match {
       case Some(node) =>
-        List(FoldStep(node)(g))
+        List(foldStep(node)(g))
       case None =>
         val whistle = inspect(g)
         val driveSteps = drive(whistle, g)
@@ -65,7 +65,7 @@ trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] wit
         List()
       case Some(_) =>
         val rbs = rebuildings(g.current.conf) filterNot dangerous
-        rbs map { RebuildStep(_): S }
+        rbs map { rebuildStep(_): S }
     }
   }
 }
@@ -73,7 +73,7 @@ trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] wit
 trait SimpleGensWithUnaryWhistle[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] with SimpleUnaryWhistle[C, D] {
   override def rebuildings(whistle: Option[Warning], g: SGraph[C, D]): List[S] = {
     val rbs = rebuildings(g.current.conf) filterNot dangerous
-    rbs map { RebuildStep(_): S }
+    rbs map { rebuildStep(_): S }
   }
 }
 
@@ -87,8 +87,8 @@ trait RuleDriving[C] extends GenericMultiTransformer[C, Int] with RewriteSemanti
           for ((next, i) <- driveConf(g.current.conf).zipWithIndex if next.isDefined)
             yield (next.get, i + 1)
         if (subSteps.isEmpty)
-          List(CompleteCurrentNodeStep())
+          List(completeCurrentNodeStep())
         else
-          List(AddChildNodesStep(subSteps))
+          List(addChildNodesStep(subSteps))
     }
 }
