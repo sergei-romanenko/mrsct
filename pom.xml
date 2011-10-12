@@ -2,15 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mrsc</groupId>
-	<artifactId>mrsc</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
-	<name>Multi-Result SuperCompiler</name>
+	<artifactId>mrsct</artifactId>
+	<version>0.1.0</version>
+	<name>Multi-Result Supercompilation toolkit</name>
 
 	<dependencyManagement>
 		<dependencies>
 		</dependencies>
 	</dependencyManagement>
 	<properties>
+		<encoding>UTF-8</encoding>
 		<scala.version>2.9.1</scala.version>
 		<maven-scala-plugin.version>2.15.2</maven-scala-plugin.version>
 		<cx.version>2.0.1</cx.version>

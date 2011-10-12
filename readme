@@ -1,5 +1,48 @@
-MRSC is Multi-Result SuperCompiler.
------------------------------------
+MRSC is a toolkit for rapid development and implementation of multi-result supercompilers.
 
-To start working with this project in eclipse, use m2eclipse and m2eclipse-scala:
-http://www.assembla.com/wiki/show/scala-ide/With_M2Eclipse
+    https://github.com/ilya-klyuchnikov/mrsc
+
+MRSCT is a variation of MRSC whose purpose is to try a design
+based on a combination of traits + self-types.
+
+The design of MRSC, at some places, is based on generating "commands"
+represented as first-order entities, which are then have to be
+executed by explicit interpreters (each interpreter being a monolitic
+match-expression.
+
+In MRSCT the generation of "commands" is replaced with direct calls to
+methods implementing the "commands".
+
+The purposes of the design based on traits + self-types are the following.
+
+  * Interfaces should be separated from their implementations.
+
+  * There should be possible to have several implementations for an interface.
+
+  * The interfaces should be "opaques" in the following sense. Schematically
+    speaking, MRSC is based on a hierarchy of levels: L_0, L_1, ..., where
+    the operations at a level L_{k+1} are definded in terms of some operations
+    defined at the level L_k. It is desirable that the operations defined at
+    the level L_{k-1} be invisible at the level L_{k+1}. In other words,
+    a level L_{k+1} should be only "aware" of the level L_k, but not of L_{k-1}.
+
+-------------------------------------------------------------
+
+To start working with this project in Eclipse, you have to install
+
+* Scala IDE for Eclipse:
+
+    http://www.scala-ide.org/
+
+* m2eclipse
+
+    http://eclipse.org/m2e/
+
+* m2eclipse-scala
+
+    https://github.com/sonatype/m2eclipse-scala/downloads
+    update site: http://alchim31.free.fr/m2e-scala/update-site/
+
+See also
+
+    http://www.assembla.com/wiki/show/scala-ide/With_M2Eclipse
