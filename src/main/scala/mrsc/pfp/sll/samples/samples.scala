@@ -5,7 +5,7 @@ import mrsc.pfp._
 import mrsc.pfp.sll._
 
 class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -14,7 +14,7 @@ class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Ex
   with AllRebuildings[Expr]
 
 class MultiLowerRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -23,7 +23,7 @@ class MultiLowerRebuildings(val program: Program, val ordering: PartialOrdering[
   with LowerRebuildingsOnBinaryWhistle[Expr]
 
 class MultiUpperRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -32,7 +32,7 @@ class MultiUpperRebuildings(val program: Program, val ordering: PartialOrdering[
   with UpperRebuildingsOnBinaryWhistle[Expr]
 
 class MultiDoubleRebuildingsOnWhistle(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -41,7 +41,7 @@ class MultiDoubleRebuildingsOnWhistle(val program: Program, val ordering: Partia
   with DoubleRebuildingsOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -50,7 +50,7 @@ class MultiLowerAllBinaryGens(val program: Program, val ordering: PartialOrderin
   with LowerAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -59,7 +59,7 @@ class MultiLowerAllBinaryGensOrDrive(val program: Program, val ordering: Partial
   with LowerAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -68,7 +68,7 @@ class MultiUpperAllBinaryGens(val program: Program, val ordering: PartialOrderin
   with UpperAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -77,7 +77,7 @@ class MultiUpperAllBinaryGensOrDrive(val program: Program, val ordering: Partial
   with UpperAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiDoubleAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -86,7 +86,7 @@ class MultiDoubleAllBinaryGens(val program: Program, val ordering: PartialOrderi
   with DoubleAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiDoubleMsg(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -95,7 +95,7 @@ class MultiDoubleMsg(val program: Program, val ordering: PartialOrdering[Expr])
   with DoubleMsgOnBinaryWhistle[Expr]
 
 class ClassicDangerousGen(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -104,7 +104,7 @@ class ClassicDangerousGen(val program: Program, val ordering: PartialOrdering[Ex
   with LowerMsgOrUpperMggOnBinaryWhistle[Expr]
 
 class ClassicCurrentGen(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPMachine[Expr]
+  extends PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
@@ -113,7 +113,7 @@ class ClassicCurrentGen(val program: Program, val ordering: PartialOrdering[Expr
   with MSGCurrentOrDriving[Expr]
 
 object Samples {
-  //type Machine1 = Machine[Expr, DriveInfo[Expr], Extra[Expr]]
+  //type Transformer1 = Transformer[Expr, DriveInfo[Expr], Extra[Expr]]
 
   def multi1(w: PartialOrdering[Expr])(p: Program) = new MultiAllRebuildings(p, w)
   def multi2(w: PartialOrdering[Expr])(p: Program) = new MultiLowerRebuildings(p, w)
@@ -226,12 +226,12 @@ object Samples {
     val info = expand(40, task.target.toString)
     print(info)
 
-    val machines = List(
+    val transformers = List(
       new MultiDoubleMsg(task.program, HEByCouplingWhistle),
       new MultiDoubleRebuildingsOnWhistle(task.program, HEWhistle),
       new MultiAllRebuildings(task.program, HEWhistle))
 
-    machines foreach { m =>
+    transformers foreach { m =>
       val gen = GraphGenerator(m, task.target)
       val (completed, unworkable) = count(gen)
       val res = expandRight(12, completed + "/" + unworkable)

@@ -1,7 +1,7 @@
 package mrsc.core
 
 /*!# Abstract steps
-   Under the hood an abstract machine deals with some kind of semantics of the language.
+   Under the hood an abstract transformer deals with some kind of semantics of the language.
    Low-level operations should be translated into high-level abstract operations (or messages) 
    over SC graphs.
 */

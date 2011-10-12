@@ -72,7 +72,7 @@ object Counting extends App {
     println()
     println("===== " + task.target + " ====")
 
-    val machines = List(
+    val transformers = List(
       new ClassicCurrentGen(task.program, whistle),
       new MultiDoubleMsg(task.program, whistle),
       new MultiUpperAllBinaryGens(task.program, whistle),
@@ -81,7 +81,7 @@ object Counting extends App {
       new MultiLowerAllBinaryGensOrDrive(task.program, whistle),
       new MultiDoubleAllBinaryGens(task.program, whistle))
 
-    machines.foreach { m =>
+    transformers.foreach { m =>
       val gen = new GraphGenerator(m, task.target)
       val res = sc(gen, limit)
       res match {

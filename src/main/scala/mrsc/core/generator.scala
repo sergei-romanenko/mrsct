@@ -1,37 +1,37 @@
 package mrsc.core
 
-import scala.annotation.tailrec
 import scala.collection.mutable.Queue
 import scala.collection.mutable.ListBuffer
 
-/*!# Abstract machines
+/*!# Abstract graph transformers
   
-  An abstract machine represents the semantics of the object language 
-  (more precisely, meta-semantics) through operations over SC graphs. 
-  `Machine` corresponds to a novel (= non-deterministic) supercompiler.
+  An abstract graph transformer represents the semantics of the object language 
+  (more precisely, meta-semantics) through operations over graphs of configurations. 
+  Graph transformers are non-deterministic, so that they can be used for implementing
+  multi-result supercompilation.
  */
 
-trait Machine[C, D] {
+trait Transformer[C, D] {
   type G = SGraph[C, D]
   type S = GraphStep[C, D]
-  def steps(g: G): List[S] 
+  def descendants(g: G): List[G]
 }
 
 /*!# Generating graphs.
  
- A graph generator knows only how to build a graph using a machine, but not what to do with this graph later.
+ A graph generator knows only how to build a graph using a transformer, but not what to do with this graph later.
  */
 
 /*! This class produces iterators producing graphs by demand. */
 
-case class GraphGenerator[C, D](machine: Machine[C, D], conf: C)
+case class GraphGenerator[C, D](transformer: Transformer[C, D], conf: C)
   extends Iterator[SGraph[C, D]] {
 
   /*! It maintains a list of graphs
      * and starts with a one-element list of graphs. 
      */
 
-  private var completeGs: Queue[SGraph[C, D]] = Queue()
+  private val completeGs: Queue[SGraph[C, D]] = Queue()
   private var gs: List[SGraph[C, D]] = List(initial(conf))
 
   private def initial(c: C): SGraph[C, D] = {
@@ -39,12 +39,11 @@ case class GraphGenerator[C, D](machine: Machine[C, D], conf: C)
     SGraph(List(initialNode), Nil, Nil)
   }
 
-  @tailrec
   private def normalize(): Unit =
-    if (completeGs.isEmpty && !gs.isEmpty) {
+    while (completeGs.isEmpty && !gs.isEmpty) {
       val pendingDelta = ListBuffer[SGraph[C, D]]()
       val h = gs.head
-      val newGs = machine.steps(h) map {_(h)}
+      val newGs = transformer.descendants(h)
       for (g1 <- newGs)
         if (g1.isComplete) {
           completeGs.enqueue(g1)
@@ -52,7 +51,6 @@ case class GraphGenerator[C, D](machine: Machine[C, D], conf: C)
           pendingDelta += g1
         }
       gs = pendingDelta ++: gs.tail
-      normalize()
     }
 
   def hasNext: Boolean = {

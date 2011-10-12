@@ -15,7 +15,7 @@ trait ProtocolSafetyAware extends SafetyAware[OmegaConf, Int] {
     protocol.unsafe(counter)
 }
 
-case class CounterMachine(val protocol: Protocol, val l: Int)
+case class CounterTransformer(val protocol: Protocol, val l: Int)
   extends CountersSyntax
   with LGen
   with LWhistle
@@ -25,7 +25,7 @@ case class CounterMachine(val protocol: Protocol, val l: Int)
   with SimpleUnaryWhistle[OmegaConf, Int]
   with SimpleCurrentGensOnWhistle[OmegaConf, Int]
 
-case class CounterMultiMachine(val protocol: Protocol, val l: Int)
+case class CounterMultiTransformer(val protocol: Protocol, val l: Int)
   extends CountersSyntax
   with LWhistle
   with CountersSemantics
@@ -43,8 +43,8 @@ object CounterSamples extends App {
   def size(n: TNode[_, _]): Int = 1 + n.outs.map(out => size(out.node)).sum
 
   def scProtocol(protocol: Protocol, l: Int): Unit = {
-    val machine = CounterMachine(protocol, l)
-    val graphs = GraphGenerator(machine, protocol.start)
+    val transformer = CounterTransformer(protocol, l)
+    val graphs = GraphGenerator(transformer, protocol.start)
 
     for (graph <- graphs if graph.isComplete) {
       val tgraph = Transformations.transpose(graph)
@@ -57,8 +57,8 @@ object CounterSamples extends App {
   }
 
   def multiScProtocol(protocol: Protocol, l: Int): Unit = {
-    val machine = CounterMultiMachine(protocol, l)
-    val graphs = GraphGenerator(machine, protocol.start)
+    val transformer = CounterMultiTransformer(protocol, l)
+    val graphs = GraphGenerator(transformer, protocol.start)
     val successGraphs = graphs filter (_.isComplete) map Transformations.transpose
     //val successGraphs = tgraphs.filter { g => checkSubTree(protocol.unsafe)(g.root) }
     if (!successGraphs.isEmpty) {
