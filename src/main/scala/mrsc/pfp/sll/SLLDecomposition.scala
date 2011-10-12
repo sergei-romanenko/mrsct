@@ -21,7 +21,7 @@ object Decomposition {
   case class RedexGCallCtr(gcall: GCall, ctr: Ctr) extends Redex(gcall)
   case class RedexGCallVar(gcall: GCall, vrb: Var) extends Redex(gcall)
 
-  def decompose(t: Expr): Dec = t match {
+  def decompose(t: Expr): Dec = (t: @unchecked) match {
     case l: Let => DecLet(l)
     case v: Var => ObservableVar(v)
     case c: Ctr => ObservableCtr(c)
@@ -29,7 +29,7 @@ object Decomposition {
     case g: GCall => processGCall(g)
   }
 
-  private def processGCall(g: GCall): Context = g.args.head match {
+  private def processGCall(g: GCall): Context = (g.args.head: @unchecked) match {
     case g1: GCall => new ContextGCall(g, processGCall(g1))
     case f: FCall => new ContextGCall(g, new ContextHole(RedexFCall(f)))
     case v: Var => new ContextHole(RedexGCallVar(g, v))

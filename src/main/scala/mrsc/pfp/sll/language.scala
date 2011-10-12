@@ -66,7 +66,7 @@ object SLLSyntax {
     case (Ctr(n1, args1), Ctr(n2, args2)) if n1 == n2     => walk1(args1 zip args2, s)
     case (FCall(n1, args1), FCall(n2, args2)) if n1 == n2 => walk1(args1 zip args2, s)
     case (GCall(n1, args1), GCall(n2, args2)) if n1 == n2 => walk1(args1 zip args2, s)
-    case (Var(n), to) => s.get(n) match {
+    case (Var(n), to) => (s.get(n): @unchecked) match {
       case Some(to1) if to1 == to => Some(s)
       case Some(to1) if to1 != to => None
       case None                   => Some(s + (n -> to))
@@ -84,7 +84,7 @@ trait SLLSemantics extends PFPSemantics[Expr] {
   val program: Program
 
   override def driveConf(conf: Expr): DriveStep[Expr] =
-    decompose(conf) match {
+    (decompose(conf): @unchecked) match {
 
       case ObservableVar(v) =>
         StopDriveStep()

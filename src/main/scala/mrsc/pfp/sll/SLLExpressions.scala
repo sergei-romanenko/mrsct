@@ -40,7 +40,7 @@ object Lifting {
   }
 
   // the only thing it does is collect definitions
-  def lift(e: Expr): (Expr, List[Def]) = e match {
+  def lift(e: Expr): (Expr, List[Def]) = (e: @unchecked) match {
     case v: Var =>
       (v, Nil)
     case Ctr(n, args) =>
@@ -88,7 +88,7 @@ object SyntaxNormalization {
     def v(x: Int): Var = Var("v." + x)
     def vn(x: Int): Name = "v." + x
 
-    def fixBoundVars(e: Expr, m: ListMap[Name, Int]): Expr = e match {
+    def fixBoundVars(e: Expr, m: ListMap[Name, Int]): Expr = (e: @unchecked) match {
       case Var(n) => m.get(n).map(v).getOrElse(n)
       case Ctr(n, args) => Ctr(n, args map { fixBoundVars(_, m) })
       case FCall(n, args) => FCall(n, args map { fixBoundVars(_, m) })
@@ -134,7 +134,7 @@ object SyntaxNormalization {
 
     }
 
-    def fixFs(e: Expr): Expr = e match {
+    def fixFs(e: Expr): Expr = (e: @unchecked) match {
       case v: Var => v
       case Ctr(n, args) => Ctr(n, args map fixFs)
       case FCall(n, args) => FCall(fmap(n), args map fixFs)
