@@ -9,7 +9,7 @@ import mrsc.pfp._
 
 @RunWith(classOf[JUnitRunner])
 class GraphOperationsSpec extends mutable.Specification
-  with GraphBuilder[Int, String] {
+  with BasicGraphBuilder[Int, String] {
 
   args(sequential = true)
 
@@ -38,7 +38,7 @@ class GraphOperationsSpec extends mutable.Specification
     }
 
     "executes AddChildNodes command" in {
-      g1 = addChildNodesStep(List((1, "0 -> 1"), (2, "0 -> 2")))(g1)
+      g1 = addChildNodes(List((1, "0 -> 1"), (2, "0 -> 2")))(g1)
 
       (g1.current.conf must_== 1) and
         (g1.completeNodes.size must_== 1) and
@@ -46,7 +46,7 @@ class GraphOperationsSpec extends mutable.Specification
     }
 
     "executes CompleteCurrentNode command" in {
-      g1 = completeCurrentNodeStep()(g1)
+      g1 = completeCurrentNode()(g1)
 
       (g1.current.conf must_== 2) and
         (g1.completeNodes.size must_== 2) and
@@ -55,7 +55,7 @@ class GraphOperationsSpec extends mutable.Specification
 
     "executes ReplaceNode command" in {
       val oldActive = g1.current
-      g1 = rebuildStep(21)(g1)
+      g1 = rebuild(21)(g1)
       val newActive = g1.current
 
       (newActive.conf must_== 21) and
@@ -66,7 +66,7 @@ class GraphOperationsSpec extends mutable.Specification
 
     "executes RollbackSubGraph command" in {
       val root = g1.current.in.node
-      g1 = rollbackStep(root, -1)(g1)
+      g1 = rollback(root, -1)(g1)
 
       (g1.current.conf must_== -1) and
         (g1.completeNodes.size must_== 0) and
@@ -74,7 +74,7 @@ class GraphOperationsSpec extends mutable.Specification
     }
 
     "executes AddChildNodes command" in {
-      g1 = addChildNodesStep(List((11, "-1 -> 11")))(g1)
+      g1 = addChildNodes(List((11, "-1 -> 11")))(g1)
 
       (g1.current.conf must_== 11) and
         (g1.completeNodes.size must_== 1) and
@@ -83,7 +83,7 @@ class GraphOperationsSpec extends mutable.Specification
 
     "executes Fold command" in {
       val root = g1.current.in.node
-      g1 = foldStep(root)(g1)
+      g1 = fold(root)(g1)
 
       (g1.current must_== null) and
         (g1.completeNodes.size must_== 2) and
@@ -101,7 +101,7 @@ class GraphOperationsSpec extends mutable.Specification
     }
 
     "executes AddChildNodes command" in {
-      g2 = addChildNodesStep(List((11, "-1 -> 11")))(g2)
+      g2 = addChildNodes(List((11, "-1 -> 11")))(g2)
 
       (g2.current.conf must_== 11) and
         (g2.completeNodes.size must_== 1) and
@@ -110,7 +110,7 @@ class GraphOperationsSpec extends mutable.Specification
 
     "executes Fold command" in {
       val root = g2.current.in.node
-      g2 = foldStep(root)(g2)
+      g2 = fold(root)(g2)
 
       (g1.current must_== null) and
         (g1.completeNodes.size must_== 2) and

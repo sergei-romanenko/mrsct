@@ -25,7 +25,7 @@ trait GenericMultiTransformer[C, D]
       List()
     else findBase(g) match {
       case Some(node) =>
-        List(foldStep(node)(g))
+        List(fold(node)(g))
       case None =>
         val whistle = inspect(g)
         val driveSteps = drive(whistle, g)
@@ -65,7 +65,7 @@ trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] wit
         List()
       case Some(_) =>
         val rbs = rebuildings(g.current.conf) filterNot dangerous
-        rbs map { rebuildStep(_): S }
+        rbs map { rebuild(_): S }
     }
   }
 }
@@ -73,7 +73,7 @@ trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] wit
 trait SimpleGensWithUnaryWhistle[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] with SimpleUnaryWhistle[C, D] {
   override def rebuildings(whistle: Option[Warning], g: SGraph[C, D]): List[S] = {
     val rbs = rebuildings(g.current.conf) filterNot dangerous
-    rbs map { rebuildStep(_): S }
+    rbs map { rebuild(_): S }
   }
 }
 
@@ -87,8 +87,8 @@ trait RuleDriving[C] extends GenericMultiTransformer[C, Int] with RewriteSemanti
           for ((next, i) <- driveConf(g.current.conf).zipWithIndex if next.isDefined)
             yield (next.get, i + 1)
         if (subSteps.isEmpty)
-          List(completeCurrentNodeStep())
+          List(completeCurrentNode())
         else
-          List(addChildNodesStep(subSteps))
+          List(addChildNodes(subSteps))
     }
 }

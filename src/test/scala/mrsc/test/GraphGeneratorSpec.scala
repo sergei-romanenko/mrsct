@@ -8,22 +8,22 @@ import mrsc.core._
 import mrsc.pfp._
 
 object TinyTransformer
-  extends Transformer[Int, String] with GraphBuilder[Int, String] {
+  extends Transformer[Int, String] with BasicGraphBuilder[Int, String] {
 
   override def descendants(g: G): List[G] = {
     g.current.conf match {
       case 0 =>
-        List(addChildNodesStep(List((1, "0 -> 1"), (2, "0 -> 2")))(g))
+        List(addChildNodes(List((1, "0 -> 1"), (2, "0 -> 2")))(g))
       case 1 =>
-        List(completeCurrentNodeStep()(g))
+        List(completeCurrentNode()(g))
       case 2 =>
-        List(rebuildStep(21)(g))
+        List(rebuild(21)(g))
       case 21 =>
-        List(rollbackStep(g.current.in.node, -1)(g))
+        List(rollback(g.current.in.node, -1)(g))
       case -1 =>
-        List(addChildNodesStep(List((11, "-1 -> 11")))(g))
+        List(addChildNodes(List((11, "-1 -> 11")))(g))
       case 11 =>
-        List(foldStep(g.current.in.node)(g))
+        List(fold(g.current.in.node)(g))
     }
   }
 }

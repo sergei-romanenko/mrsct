@@ -4,111 +4,71 @@ import mrsc.core._
 import mrsc.pfp._
 import mrsc.pfp.sll._
 
-class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
+trait PFPGraphBuilder
+  extends BasicGraphBuilder[Expr, DriveInfo[Expr]]
+  with PFPTransformer[Expr]
   with SLLSyntax
   with SLLSemantics
   with Driving[Expr]
   with RenamingFolding[Expr]
+
+class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with AllRebuildings[Expr]
 
 class MultiLowerRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with LowerRebuildingsOnBinaryWhistle[Expr]
 
 class MultiUpperRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with UpperRebuildingsOnBinaryWhistle[Expr]
 
 class MultiDoubleRebuildingsOnWhistle(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with DoubleRebuildingsOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with LowerAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with LowerAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with UpperAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with UpperAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiDoubleAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with DoubleAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiDoubleMsg(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with DoubleMsgOnBinaryWhistle[Expr]
 
 class ClassicDangerousGen(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with LowerMsgOrUpperMggOnBinaryWhistle[Expr]
 
 class ClassicCurrentGen(val program: Program, val ordering: PartialOrdering[Expr])
-  extends PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
-  with RenamingFolding[Expr]
+  extends PFPGraphBuilder
   with BinaryWhistle[Expr]
   with MSGCurrentOrDriving[Expr]
 
