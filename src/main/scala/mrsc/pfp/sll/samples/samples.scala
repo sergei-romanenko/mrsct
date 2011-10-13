@@ -8,8 +8,7 @@ trait PFPGraphBuilder
   extends BasicGraphBuilder[Expr, DriveInfo[Expr]]
   with PFPTransformer[Expr]
   with SLLSyntax
-  with SLLSemantics
-  with Driving[Expr]
+  with SLLDriving
   with RenamingFolding[Expr]
 
 class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])

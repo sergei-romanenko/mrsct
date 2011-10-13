@@ -79,18 +79,18 @@ object SLLSyntax {
 
 }
 
-trait SLLSemantics extends PFPSemantics[Expr] { this: DriveSteps[Expr] =>
+trait SLLDriving extends PFPTransformer[Expr]{ this: DriveSteps[Expr] =>
 
   val program: Program
 
-  override def driveConf(conf: Expr): DriveStep[Expr] =
-    (decompose(conf): @unchecked) match {
+  override def drive(g: G): List[G] =
+    (decompose(g.current.conf): @unchecked) match {
 
       case ObservableVar(v) =>
-        stopDriveStep()
+        List(stopDriveStep()(g))
 
       case ObservableCtr(Ctr(cn, args)) =>
-        decomposeDriveStep({ Ctr(cn, _: List[Expr]) }, args)
+        List(decomposeDriveStep({ Ctr(cn, _: List[Expr]) }, args)(g))
 
       case DecLet(Let(term, bs)) =>
         val (names, es) = bs.unzip
@@ -99,19 +99,19 @@ trait SLLSemantics extends PFPSemantics[Expr] { this: DriveSteps[Expr] =>
           val sub = (names zip binds).toMap
           subst(in, sub)
         }
-        decomposeDriveStep(compose, term :: es)
+        List(decomposeDriveStep(compose, term :: es)(g))
 
       case context @ Context(RedexFCall(FCall(name, args))) =>
         val FFun(_, fargs, body) = program.f(name)
         val fReduced = subst(body, (fargs zip args).toMap)
         val nExpr = context(fReduced)
-        transientDriveStep(nExpr)
+        List(transientDriveStep(nExpr)(g))
 
       case context @ Context(RedexGCallCtr(GCall(name, _ :: args), Ctr(cname, cargs))) =>
         val GFun(_, p, gargs, body) = program.g(name, cname)
         val gReduced = subst(body, ((p.args ++ gargs) zip (cargs ++ args)).toMap)
         val nExpr = context(gReduced)
-        transientDriveStep(nExpr)
+        List(transientDriveStep(nExpr)(g))
 
       case context @ Context(RedexGCallVar(GCall(name, _ :: args), v)) =>
         val cases = program.gs(name) map {
@@ -122,7 +122,7 @@ trait SLLSemantics extends PFPSemantics[Expr] { this: DriveSteps[Expr] =>
             val driven = subst(context(gReduced), contraction.subst)
             (driven, contraction)
         }
-        variantsDriveStep(cases)
+        List(variantsDriveStep(cases)(g))
     }
 
   def instantiate(p: Pat, v: Var): Ctr = {

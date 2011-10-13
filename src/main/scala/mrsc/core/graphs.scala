@@ -133,12 +133,10 @@ object Transformations {
    */
   def transpose[C, D, E](g: SGraph[C, D]): TGraph[C, D] = {
     require(g.isComplete)
-    val allLeaves = g.completeLeaves
-    val allNodes = g.completeNodes
-    val orderedNodes = allNodes.sortBy(_.sPath)(PathOrdering)
+    val orderedNodes = g.completeNodes.sortBy(_.sPath)(PathOrdering)
     val rootNode = orderedNodes.head
 
-    val leafPathes = allLeaves.map(_.sPath)
+    val leafPathes = g.completeLeaves.map(_.sPath)
     val levels = orderedNodes.groupBy(_.sPath.length).toList.sortBy(_._1).map(_._2)
     val sortedLevels = levels.map(_.sortBy(_.tPath)(PathOrdering))
     val (tNodes, tLeaves) = subTranspose(sortedLevels, leafPathes)

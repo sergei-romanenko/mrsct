@@ -13,7 +13,6 @@ import scala.collection.mutable.ListBuffer
 
 trait Transformer[C, D] {
   type G = SGraph[C, D]
-  type S = G => G
   def descendants(g: G): List[G]
 }
 
