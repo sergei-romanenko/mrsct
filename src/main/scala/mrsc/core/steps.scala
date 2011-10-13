@@ -6,21 +6,20 @@ package mrsc.core
    over SC graphs.
 */
 
-trait GraphBuilder[C, D] {
-  type GG = SGraph[C, D] => SGraph[C, D]
-  def completeCurrentNode(): GG
-  def addChildNodes(ns: List[(C, D)]): GG
-  def fold(baseNode: SNode[C, D]): GG
-  def rebuild(c: C): GG
-  def rollback(to: SNode[C, D], c: C): GG
+trait GraphBuilder[C, D] extends GraphTypes[C, D] {
+  def completeCurrentNode()(g: G): G
+  def addChildNodes(ns: List[(C, D)])(g: G): G
+  def fold(baseNode: SNode[C, D])(g: G): G
+  def rebuild(c: C)(g: G): G
+  def rollback(to: SNode[C, D], c: C)(g: G): G
 }
 
 trait BasicGraphBuilder[C, D] extends GraphBuilder[C, D] {
 
-  def completeCurrentNode() = (g: SGraph[C, D]) =>
+  def completeCurrentNode()(g: G) =
     SGraph(g.incompleteLeaves.tail, g.current :: g.completeLeaves, g.current :: g.completeNodes)
 
-  def addChildNodes(ns: List[(C, D)]) = (g: SGraph[C, D]) =>
+  def addChildNodes(ns: List[(C, D)])(g: G) =
     {
       val deltaLeaves: List[SNode[C, D]] = ns.zipWithIndex map {
         case ((conf, dInfo), i) =>
@@ -33,19 +32,19 @@ trait BasicGraphBuilder[C, D] extends GraphBuilder[C, D] {
       SGraph(deltaLeaves ++ g.incompleteLeaves.tail, g.completeLeaves, g.current :: g.completeNodes)
     }
 
-  def fold(baseNode: SNode[C, D]) = (g: SGraph[C, D]) =>
+  def fold(baseNode: SNode[C, D])(g: G) =
     {
       val node = g.current.copy(base = Some(baseNode.sPath))
       SGraph(g.incompleteLeaves.tail, node :: g.completeLeaves, node :: g.completeNodes)
     }
 
-  def rebuild(c: C) = (g: SGraph[C, D]) =>
+  def rebuild(c: C)(g: G) =
     {
       val node = g.current.copy(conf = c)
       SGraph(node :: g.incompleteLeaves.tail, g.completeLeaves, g.completeNodes)
     }
 
-  def rollback(to: SNode[C, D], c: C) = (g: SGraph[C, D]) =>
+  def rollback(to: SNode[C, D], c: C)(g: G) =
     {
       def prune_?(n: SNode[C, D]) = n.tPath.startsWith(to.tPath)
       val node = to.copy(conf = c)

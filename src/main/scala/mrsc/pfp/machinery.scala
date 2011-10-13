@@ -128,12 +128,8 @@ trait UpperAllBinaryGensOrDriveOnBinaryWhistle[C] extends PFPTransformer[C] with
     whistle match {
       case None => List()
       case Some(upper) =>
-        val rollbacks = mutualGens(upper.conf, g.current.conf) map translate map { rollback(upper, _) }
-        if (rollbacks.isEmpty) {
-          drive(g)
-        } else {
-          rollbacks map (_(g))
-        }
+        val rollbacks = mutualGens(upper.conf, g.current.conf) map translate map { rollback(upper, _)(g) }
+        if (rollbacks.isEmpty) drive(g) else rollbacks
     }
 }
 

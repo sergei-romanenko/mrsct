@@ -21,22 +21,20 @@ case class VariantsStepInfo[C](contr: Contraction[C]) extends DriveInfo[C] {
 
 trait DriveSteps[C] { this: GraphBuilder[C, DriveInfo[C]] =>
 
-  type DriveStep[C] = SGraph[C, DriveInfo[C]] => SGraph[C, DriveInfo[C]]
-  
-  def transientDriveStep(next: C): DriveStep[C] = {
+  def transientDriveStep(next: C): GG = {
     val subSteps = List((next, TransientStepInfo)): List[(C, DriveInfo[C])]
     addChildNodes(subSteps)
   }
 
-  def stopDriveStep(): DriveStep[C] = completeCurrentNode()
+  def stopDriveStep(): GG = completeCurrentNode()
 
-  def decomposeDriveStep(compose: List[C] => C, parts: List[C]): DriveStep[C] = {
+  def decomposeDriveStep(compose: List[C] => C, parts: List[C]): GG = {
     val stepInfo = DecomposeStepInfo(compose)
     val subSteps = parts map { a => (a, stepInfo) }
     addChildNodes(subSteps)
   }
 
-  def variantsDriveStep(cases: List[(C, Contraction[C])]): DriveStep[C] = {
+  def variantsDriveStep(cases: List[(C, Contraction[C])]): GG = {
     val ns = cases map { v => (v._1, VariantsStepInfo(v._2)) }
     addChildNodes(ns)
   }

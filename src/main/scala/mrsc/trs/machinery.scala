@@ -41,23 +41,23 @@ trait SafetyAware[C, D] extends GenericMultiTransformer[C, D] {
 }
 
 trait SimpleInstanceFolding[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] {
-  override def findBase(g: SGraph[C, D]): Option[SNode[C, D]] =
+  override def findBase(g: G): Option[SNode[C, D]] =
     g.current.ancestors.find { n => instanceOf(g.current.conf, n.conf) }
 }
 
 trait SimpleInstanceFoldingToAny[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] {
-  override def findBase(g: SGraph[C, D]): Option[SNode[C, D]] =
+  override def findBase(g: G): Option[SNode[C, D]] =
     g.completeNodes.find { n => instanceOf(g.current.conf, n.conf) }
 }
 
 trait SimpleUnaryWhistle[C, D] extends GenericMultiTransformer[C, D] {
   def dangerous(c: C): Boolean
-  override def inspect(g: SGraph[C, D]): Option[Warning] =
+  override def inspect(g: G): Option[Warning] =
     if (dangerous(g.current.conf)) Some(g.current) else None
 }
 
 trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] with SimpleUnaryWhistle[C, D] {
-  override def rebuildings(whistle: Option[Warning], g: SGraph[C, D]): List[G] = {
+  override def rebuildings(whistle: Option[Warning], g: G): List[G] = {
     whistle match {
       case None =>
         List()
@@ -69,14 +69,14 @@ trait SimpleCurrentGensOnWhistle[C, D] extends GenericMultiTransformer[C, D] wit
 }
 
 trait SimpleGensWithUnaryWhistle[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] with SimpleUnaryWhistle[C, D] {
-  override def rebuildings(whistle: Option[Warning], g: SGraph[C, D]): List[G] = {
+  override def rebuildings(whistle: Option[Warning], g: G): List[G] = {
     val rbs = rebuildings(g.current.conf) filterNot dangerous
     rbs map { rebuild(_)(g) }
   }
 }
 
 trait RuleDriving[C] extends GenericMultiTransformer[C, Int] with RewriteSemantics[C] {
-  override def drive(whistle: Option[Warning], g: SGraph[C, Int]): List[G] =
+  override def drive(whistle: Option[Warning], g: G): List[G] =
     whistle match {
       case Some(_) =>
         List()
