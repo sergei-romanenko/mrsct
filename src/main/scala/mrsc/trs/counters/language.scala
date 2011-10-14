@@ -2,48 +2,48 @@ package mrsc.trs.counters
 
 import mrsc.trs._
 
-sealed trait Component {
-  def +(comp: Component): Component
-  def -(comp: Component): Component
+sealed trait Expr {
+  def +(comp: Expr): Expr
+  def -(comp: Expr): Expr
   def >=(i: Int): Boolean
   def ===(i: Int): Boolean
 }
 
-case class Value(i: Int) extends Component {
-  override def +(comp: Component) = comp match {
+case class Num(i: Int) extends Expr {
+  override def +(comp: Expr) = comp match {
     case Omega => Omega
-    case Value(j) => Value(i + j)
+    case Num(j) => Num(i + j)
   }
-  override def -(comp: Component) = comp match {
+  override def -(comp: Expr) = comp match {
     case Omega => Omega
-    case Value(j) => Value(i - j)
+    case Num(j) => Num(i - j)
   }
   override def ===(j: Int) = i == j
   override def >=(j: Int) = i >= j
   override def toString = i.toString
 }
 
-case object Omega extends Component {
-  def +(comp: Component) = Omega
-  def -(comp: Component) = Omega
+case object Omega extends Expr {
+  def +(comp: Expr) = Omega
+  def -(comp: Expr) = Omega
   def >=(comp: Int) = true
   override def ===(j: Int) = true
   override def toString = "ϖ"
 }
 
-trait CountersSyntax extends TRSSyntax[OmegaConf] {
-  def equiv(c1: OmegaConf, c2: OmegaConf) = CountersSyntax.equiv(c1, c2)
-  def instanceOf(c1: OmegaConf, c2: OmegaConf) = CountersSyntax.instanceOf(c1, c2)
-  def rebuildings(c: OmegaConf) = CountersSyntax.rebuildings(c)
+trait CountersSyntax extends TRSSyntax[Conf] {
+  def equiv(c1: Conf, c2: Conf) = CountersSyntax.equiv(c1, c2)
+  def instanceOf(c1: Conf, c2: Conf) = CountersSyntax.instanceOf(c1, c2)
+  def rebuildings(c: Conf) = CountersSyntax.rebuildings(c)
 }
 
 object CountersSyntax extends {
-  def equiv(c1: OmegaConf, c2: OmegaConf) = c1 == c2
+  def equiv(c1: Conf, c2: Conf) = c1 == c2
 
-  def instanceOf(c1: OmegaConf, c2: OmegaConf): Boolean =
+  def instanceOf(c1: Conf, c2: Conf): Boolean =
     (c1, c2).zipped.forall(instanceOf)
 
-  def instanceOf(x: Component, y: Component) = (x, y) match {
+  def instanceOf(x: Expr, y: Expr) = (x, y) match {
     case (_, Omega) => true
     case (_, _) => x == y
   }
@@ -53,23 +53,23 @@ object CountersSyntax extends {
     case xs :: xss => for (y <- xs; ys <- cartProd(xss)) yield y :: ys
   }
 
-  def rebuildings(c: OmegaConf) = cartProd(c map genComp) - c
+  def rebuildings(c: Conf) = cartProd(c map genExpr) - c
 
-  private def genComp(c: Component): List[Component] = c match {
+  private def genExpr(c: Expr): List[Expr] = c match {
     case Omega => List(Omega)
     case value => List(Omega, value)
   }
 }
 
-trait CountersSemantics extends RewriteSemantics[OmegaConf] {
+trait CountersSemantics extends RewriteSemantics[Conf] {
   val protocol: Protocol
-  def driveConf(c: OmegaConf) = protocol.rules.map { _.lift(c) }
+  def driveConf(c: Conf) = protocol.rules.map { _.lift(c) }
 }
 
 trait LWhistle {
   val l: Int
-  def dangerous(counter: OmegaConf) = counter exists {
-    case Value(i) => i >= l
+  def dangerous(counter: Conf) = counter exists {
+    case Num(i) => i >= l
     case Omega => false
   }
 }
