@@ -3,7 +3,6 @@ package mrsc.pfp.sll
 import mrsc.core._
 import mrsc.pfp._
 
-import Decomposition._
 import SLLSyntax._
 
 trait SLLSyntax extends PFPSyntax[Expr] {
@@ -79,51 +78,59 @@ object SLLSyntax {
 
 }
 
-trait SLLDriving extends PFPTransformer[Expr]{ this: DriveSteps[Expr] =>
+trait SLLDriving extends PFPTransformer[Expr]
+  with Reducer { this: DriveSteps[Expr] =>
+
+  type R = List[GG]
 
   val program: Program
 
-  override def drive(g: G): List[G] =
-    (decompose(g.current.conf): @unchecked) match {
+  def drive(g: G): List[G] =
+    decompose(g.current.conf) map { _(g) }
 
-      case ObservableVar(v) =>
-        List(stopDriveStep()(g))
-
-      case ObservableCtr(Ctr(cn, args)) =>
-        List(decomposeDriveStep({ Ctr(cn, _: List[Expr]) }, args)(g))
-
-      case DecLet(Let(term, bs)) =>
-        val (names, es) = bs.unzip
-        val compose = { parts: List[Expr] =>
-          val in :: binds = parts
-          val sub = (names zip binds).toMap
-          subst(in, sub)
-        }
-        List(decomposeDriveStep(compose, term :: es)(g))
-
-      case context @ Context(RedexFCall(FCall(name, args))) =>
-        val FFun(_, fargs, body) = program.f(name)
-        val fReduced = subst(body, (fargs zip args).toMap)
-        val nExpr = context(fReduced)
-        List(transientDriveStep(nExpr)(g))
-
-      case context @ Context(RedexGCallCtr(GCall(name, _ :: args), Ctr(cname, cargs))) =>
-        val GFun(_, p, gargs, body) = program.g(name, cname)
-        val gReduced = subst(body, ((p.args ++ gargs) zip (cargs ++ args)).toMap)
-        val nExpr = context(gReduced)
-        List(transientDriveStep(nExpr)(g))
-
-      case context @ Context(RedexGCallVar(GCall(name, _ :: args), v)) =>
-        val cases = program.gs(name) map {
-          case GFun(_, p, gargs, body) =>
-            val ctr = instantiate(p, v)
-            val gReduced = subst(body, ((p.args ++ gargs) zip (ctr.args ++ args)).toMap)
-            val contraction = Contraction(v.name, Ctr(p.name, ctr.args))
-            val driven = subst(context(gReduced), contraction.subst)
-            (driven, contraction)
-        }
-        List(variantsDriveStep(cases)(g))
+  def caseDecLet(let: Let): List[GG] = {
+    val (names, es) = let.bindings.unzip
+    val compose = { parts: List[Expr] =>
+      val in :: binds = parts
+      val sub = (names zip binds).toMap
+      subst(in, sub)
     }
+    List(decomposeDriveStep(compose, let.term :: es))
+  }
+
+  def caseObservableCtr(ctr: Ctr): List[GG] =
+    List(decomposeDriveStep({ Ctr(ctr.name, _: List[Expr]) }, ctr.args))
+
+  def caseObservableVar(v: Var): List[GG] =
+    List(stopDriveStep())
+
+  def caseFRedex(ctx: Ctx, fcall: FCall): List[GG] = {
+    val FFun(_, fargs, body) = program.f(fcall.name)
+    val reduced = subst(body, (fargs zip fcall.args).toMap)
+    List(transientDriveStep(ctx(reduced)))
+  }
+
+  def caseGRedexCtr(ctx: Ctx, gcall: GCall, ctr: Ctr): List[GG] = {
+    val GFun(_, p, gargs, body) = program.g(gcall.name, ctr.name)
+    val reduced = subst(
+      body,
+      ((p.args ++ gargs) zip (ctr.args ++ gcall.args.tail)).toMap)
+    List(transientDriveStep(ctx(reduced)))
+  }
+
+  def caseGRedexVar(ctx: Ctx, gcall: GCall, v: Var): List[GG] = {
+    val cases = program.gs(gcall.name) map {
+      case GFun(_, p, gargs, body) =>
+        val ctr = instantiate(p, v)
+        val reduced = subst(
+          body,
+          ((p.args ++ gargs) zip (ctr.args ++ gcall.args.tail)).toMap)
+        val contraction = Contraction(v.name, Ctr(p.name, ctr.args))
+        val driven = subst(ctx(reduced), contraction.subst)
+        (driven, contraction)
+    }
+    List(variantsDriveStep(cases))
+  }
 
   def instantiate(p: Pat, v: Var): Ctr = {
     val vars = p.args.indices.toList.map { i => Var("de_" + p.name + "_" + i + "/" + v.name) }

@@ -1,38 +1,34 @@
 package mrsc.pfp.sll
 
-object Decomposition {
-  abstract sealed class Dec
-  case class DecLet(let: Let) extends Dec
-  sealed trait Observable extends Dec
-  case class ObservableCtr(c: Ctr) extends Observable
-  case class ObservableVar(v: Var) extends Observable
+trait Reducer {
 
-  abstract case class Context(red: Redex) extends Dec with (Expr => Expr)
+  type R
   
-  private class ContextHole(override val red: Redex) extends Context(red) {
-    def apply(t: Expr): Expr = t
-  }
-  private class ContextGCall(gcall: GCall, context: Context) extends Context(context.red) {
-    def apply(t: Expr): Expr = GCall(gcall.name, context(t) :: gcall.args.tail)
-  }
+  def caseDecLet(let: Let): R
+  def caseObservableCtr(ctr: Ctr): R
+  def caseObservableVar(v: Var): R
+  def caseFRedex(ctx: Ctx, f: FCall): R
+  def caseGRedexCtr(ctx: Ctx, g: GCall, c: Ctr): R
+  def caseGRedexVar(ctx: Ctx, g: GCall, v: Var): R
 
-  sealed abstract class Redex(term: Expr)
-  case class RedexFCall(fcall: FCall) extends Redex(fcall)
-  case class RedexGCallCtr(gcall: GCall, ctr: Ctr) extends Redex(gcall)
-  case class RedexGCallVar(gcall: GCall, vrb: Var) extends Redex(gcall)
+  type Ctx = (Expr => Expr)
 
-  def decompose(t: Expr): Dec = (t: @unchecked) match {
-    case l: Let => DecLet(l)
-    case v: Var => ObservableVar(v)
-    case c: Ctr => ObservableCtr(c)
-    case f: FCall => new ContextHole(RedexFCall(f))
-    case g: GCall => processGCall(g)
+  def decompose(t: Expr): R = (t: @unchecked) match {
+    case l: Let => caseDecLet(l)
+    case c: Ctr => caseObservableCtr(c)
+    case v: Var => caseObservableVar(v)
+    case f: FCall => caseFRedex(t => t, f)
+    case g: GCall => decomposeGCall(t => t, g)
   }
 
-  private def processGCall(g: GCall): Context = (g.args.head: @unchecked) match {
-    case g1: GCall => new ContextGCall(g, processGCall(g1))
-    case f: FCall => new ContextGCall(g, new ContextHole(RedexFCall(f)))
-    case v: Var => new ContextHole(RedexGCallVar(g, v))
-    case c: Ctr => new ContextHole(RedexGCallCtr(g, c))
+  private def decomposeGCall(ctx: Ctx, g: GCall): R = (g.args.head: @unchecked) match {
+    case c: Ctr =>
+      caseGRedexCtr(ctx, g, c)
+    case v: Var =>
+      caseGRedexVar(ctx, g, v)
+    case f: FCall =>
+      caseFRedex(f => ctx(GCall(g.name, f :: g.args.tail)), f)
+    case g1: GCall =>
+      decomposeGCall(g1 => ctx(GCall(g.name, g1 :: g.args.tail)), g1)
   }
 }
