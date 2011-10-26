@@ -5,7 +5,6 @@ import mrsc.core._
 trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]]
   with GraphBuilder[C, DriveInfo[C]] with DriveSteps[C] {
 
-  type N = SNode[C, DriveInfo[C]]
   type Warning
   def findBase(g: G): Option[N]
   def drive(g: G): List[G]
@@ -24,7 +23,7 @@ trait PFPTransformer[C] extends Transformer[C, DriveInfo[C]]
     }
 }
 
-trait RenamingFolding[C] extends PFPTransformer[C] with PFPSyntax[C] {
+trait Folding[C] extends PFPTransformer[C] with PFPSyntax[C] {
   override def findBase(g: G): Option[N] =
     g.current.ancestors.find { n => subclass.equiv(g.current.conf, n.conf) }
 }

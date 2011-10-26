@@ -12,6 +12,7 @@ import scala.collection.mutable.ListBuffer
  */
 
 trait GraphTypes[C, D] {
+  type N = SNode[C, D]
   type G = SGraph[C, D]
   type GG = SGraph[C, D] => SGraph[C, D]
 }

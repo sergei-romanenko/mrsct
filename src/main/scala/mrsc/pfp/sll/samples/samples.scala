@@ -9,7 +9,7 @@ trait PFPGraphBuilder
   with PFPTransformer[Expr]
   with SLLSyntax
   with SLLDriving
-  with RenamingFolding[Expr]
+  with Folding[Expr]
 
 class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder

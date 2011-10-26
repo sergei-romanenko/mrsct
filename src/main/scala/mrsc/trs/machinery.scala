@@ -5,9 +5,9 @@ import mrsc.core._
 trait GenericMultiTransformer[C, D]
   extends Transformer[C, D] with GraphBuilder[C, D] {
 
-  type Warning = SNode[C, D]
+  type Warning = N
   def unsafe(g: G): Boolean = false
-  def findBase(g: G): Option[SNode[C, D]]
+  def findBase(g: G): Option[N]
   def inspect(g: G): Option[Warning]
   def drive(whistle: Option[Warning], g: G): List[G]
   def rebuildings(whistle: Option[Warning], g: G): List[G]
@@ -41,12 +41,12 @@ trait SafetyAware[C, D] extends GenericMultiTransformer[C, D] {
 }
 
 trait SimpleInstanceFolding[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] {
-  override def findBase(g: G): Option[SNode[C, D]] =
+  override def findBase(g: G): Option[N] =
     g.current.ancestors.find { n => instanceOf(g.current.conf, n.conf) }
 }
 
 trait SimpleInstanceFoldingToAny[C, D] extends GenericMultiTransformer[C, D] with TRSSyntax[C] {
-  override def findBase(g: G): Option[SNode[C, D]] =
+  override def findBase(g: G): Option[N] =
     g.completeNodes.find { n => instanceOf(g.current.conf, n.conf) }
 }
 
