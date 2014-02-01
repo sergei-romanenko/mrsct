@@ -67,7 +67,7 @@ case class SLLTask(target: Expr, program: Program) {
 
 object SLLParsers extends StandardTokenParsers with ImplicitConversions {
   lexical.delimiters += ("(", ")", ",", "=", ";")
-  def prog = definition+
+  def prog = rep1(definition)
   def definition: Parser[Def] = gFun | fFun
   def term: Parser[Expr] = fcall | gcall | ctr | vrb
   def uid = ident ^? {case id if id.charAt(0).isUpper => id}
@@ -77,7 +77,7 @@ object SLLParsers extends StandardTokenParsers with ImplicitConversions {
   def vrb = lid ^^ Var
   def pat = uid ~ ("(" ~> repsep(lid, ",") <~ ")") ^^ Pat
   def fFun = fid ~ ("(" ~> repsep(lid, ",") <~ ")") ~ ("=" ~> term <~ ";") ^^ FFun
-  def gFun = gid ~ ("(" ~> pat) ~ ((("," ~> lid)*) <~ ")") ~ ("=" ~> term <~ ";") ^^ GFun
+  def gFun = gid ~ ("(" ~> pat) ~ ((rep("," ~> lid)) <~ ")") ~ ("=" ~> term <~ ";") ^^ GFun
   def ctr = uid ~ ("(" ~> repsep(term, ",") <~ ")") ^^ Ctr
   def fcall = fid ~ ("(" ~> repsep(term, ",") <~ ")") ^^ FCall
   def gcall = gid ~ ("(" ~> repsep(term, ",") <~ ")") ^^ GCall

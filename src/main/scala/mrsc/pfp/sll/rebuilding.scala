@@ -5,7 +5,7 @@ import mrsc.pfp._
 object SLLRebuilding {
 
   def gens(e: Expr): List[Let] =
-    rebuildings(e) map { case (e1, sub) => Let(e1, sub toList) }
+    rebuildings(e) map { case (e1, sub) => Let(e1, sub.toList) }
 
   def rebuildings(e: Expr): List[RawRebuilding[Expr]] = e match {
     case Let(_, _) =>
