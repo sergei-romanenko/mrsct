@@ -22,7 +22,7 @@ case class Proj1(e: Expr) extends Expr
 case class Proj2(e: Expr) extends Expr
 case class CtrApp(ctr: String, arg: Expr) extends Expr
 // id(s) = s
-case class Id
+case class Id()
 
 // these terms are reducible
 case class AbsApp(abs: Abs, arg: Expr) extends Expr

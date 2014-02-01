@@ -2,7 +2,6 @@ package mrsc.pfp.sll
 
 import scala.annotation.tailrec
 
-//import Decomposition._
 import SLLSyntax._
 
 object SLLInterpreter {

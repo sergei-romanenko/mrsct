@@ -48,9 +48,9 @@ trait BasicGraphBuilder[C, D] extends GraphBuilder[C, D] {
     {
       def prune_?(n: N) = n.tPath.startsWith(to.tPath)
       val node = to.copy(conf = c)
-      val completeNodes1 = g.completeNodes.remove(prune_?)
-      val completeLeaves1 = g.completeLeaves.remove(prune_?)
-      val incompleteLeaves1 = g.incompleteLeaves.tail.remove(prune_?)
+      val completeNodes1 = g.completeNodes.filterNot(prune_?)
+      val completeLeaves1 = g.completeLeaves.filterNot(prune_?)
+      val incompleteLeaves1 = g.incompleteLeaves.tail.filterNot(prune_?)
       SGraph(node :: incompleteLeaves1, completeLeaves1, completeNodes1)
     }
 }

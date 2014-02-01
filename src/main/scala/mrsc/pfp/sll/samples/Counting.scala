@@ -8,7 +8,7 @@ import mrsc.pfp.sll._
 
 object Counting extends App {
 
-  case class CountingResult(completed: Integer, residuals: Set[Expr])
+  case class CountingResult(completed: Int, residuals: Set[Expr])
 
   val program: Program =
     """

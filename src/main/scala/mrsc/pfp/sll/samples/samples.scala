@@ -165,7 +165,7 @@ object Samples {
   }
 
   // count graphs
-  def count(gen: GraphGenerator[_, _], limit: Integer = 1800): (Integer, Integer) = {
+  def count(gen: GraphGenerator[_, _], limit: Int = 1800): (Int, Int) = {
     var completed = 0
     var unworkable = 0
     for (g <- gen) {

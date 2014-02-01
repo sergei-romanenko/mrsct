@@ -53,7 +53,7 @@ object CountersSyntax extends {
     case xs :: xss => for (y <- xs; ys <- cartProd(xss)) yield y :: ys
   }
 
-  def rebuildings(c: Conf) = cartProd(c map genExpr) - c
+  def rebuildings(c: Conf) = cartProd(c map genExpr).filterNot(_ == c)
 
   private def genExpr(c: Expr): List[Expr] = c match {
     case Omega => List(Omega)
