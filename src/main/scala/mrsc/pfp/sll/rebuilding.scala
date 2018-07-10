@@ -20,7 +20,7 @@ object SLLRebuilding {
     import scala.collection.mutable.ListBuffer
     val ls = ListBuffer[RawRebuilding[Expr]]()
     for (e <- es) {
-      if (ls.find(e1 => SLLSyntax.equiv(e1._1, e._1)).isEmpty) {
+      if (!ls.exists(e1 => SLLSyntax.equiv(e1._1, e._1))) {
         ls += e
       }
     }
@@ -64,5 +64,5 @@ object SLLRebuilding {
   // here we use top expression like #hash to prevent name collisions in the future
   // nice solution is welcome
   private def newName(e: Expr, top: Expr): Name =
-    "gen/" + e.toString() + "[" + top.toString() + "]"
+    "gen/" + e.toString + "[" + top.toString + "]"
 }

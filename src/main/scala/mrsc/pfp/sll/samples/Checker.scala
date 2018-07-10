@@ -10,7 +10,7 @@ object Checker {
     case _ => Ctr("S", List(sllNumber(n - 1)))
   }
 
-  val ns = (0 to 4 map sllNumber).toList
+  val ns: List[Expr] = (0 to 4 map sllNumber).toList
 
   // very naive
   private def lists(size: Int): List[Expr] = size match {
@@ -21,12 +21,12 @@ object Checker {
       for (n <- ns; l <- prevs) yield Ctr("Cons", List(n, l))
   }
 
-  val ls = (0 to 4 map lists).toList.flatten.toList
+  val ls: List[Expr] = (0 to 4 map lists).toList.flatten
 
-  def main(args: Array[String]) {
-    ns.map(println)
+  def main(args: Array[String]): Unit = {
+    ns.foreach(println)
     println()
-    ls.map(println)
+    ls.foreach(println)
     
     val vs = List(Var("m"), Var("n"))
     val ss = subs(vs)
@@ -47,7 +47,7 @@ object Checker {
     case v :: vs1 => 
       val ss1 = values(v)
       val ss2 = subs(vs1)
-      for (value <- ss1; sub <- ss2) yield (sub + (v -> value))
+      for (value <- ss1; sub <- ss2) yield sub + (v -> value)
   }
   
   def check(t1: SLLTask, t2: SLLTask) {

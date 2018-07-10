@@ -7,6 +7,7 @@ import SLLSyntax._
 
 trait SLLSyntax extends PFPSyntax[Expr] {
   def equiv(c1: Expr, c2: Expr): Boolean = SLLSyntax.equiv(c1, c2)
+
   def instanceOf(c1: Expr, c2: Expr): Boolean = SLLSyntax.instanceOf(c1, c2)
 
   override def subst(c: Expr, sub: Subst[Expr]): Expr =
@@ -18,23 +19,31 @@ trait SLLSyntax extends PFPSyntax[Expr] {
   override def translate(rb: RawRebuilding[Expr]): Expr =
     Let(rb._1, rb._2.toList)
 
-  override def findSubst(from: Expr, to: Expr) =
+  override def findSubst(from: Expr, to: Expr): Option[Subst[Expr]] =
     SLLSyntax.findSubst(from, to)
 
-  override def size(e: Expr) = e.size
-  override val subclass = new SimplePartialOrdering[Expr] {
-    override def lteq(c1: Expr, c2: Expr) = SLLSyntax.instanceOf(c1, c2)
-  }
+  override def size(e: Expr): Int = e.size()
+
+  override val subclass: SimplePartialOrdering[Expr] =
+    (c1: Expr, c2: Expr) => SLLSyntax.instanceOf(c1, c2)
 
 }
 
 object SLLSyntax {
   def subst(term: Expr, m: Subst[Expr]): Expr = term match {
-    case v @ Var(n) => m.getOrElse(n, v)
-    case Ctr(name, args) => Ctr(name, args map { subst(_, m) })
-    case FCall(name, args) => FCall(name, args map { subst(_, m) })
-    case GCall(name, args) => GCall(name, args map { subst(_, m) })
-    case Where(e, defs) => Where(subst(e, m), defs map { subst(_, m) })
+    case v@Var(n) => m.getOrElse(n, v)
+    case Ctr(name, args) => Ctr(name, args map {
+      subst(_, m)
+    })
+    case FCall(name, args) => FCall(name, args map {
+      subst(_, m)
+    })
+    case GCall(name, args) => GCall(name, args map {
+      subst(_, m)
+    })
+    case Where(e, defs) => Where(subst(e, m), defs map {
+      subst(_, m)
+    })
     case Let(e, bs) => Let(subst(e, m), bs)
   }
 
@@ -54,9 +63,11 @@ object SLLSyntax {
 
   def vars(t: Expr): List[Var] = vs(t).distinct
 
-  def equiv(c1: Expr, c2: Expr): Boolean = instanceOf(c1, c2) && instanceOf(c2, c1)
+  def equiv(c1: Expr, c2: Expr): Boolean =
+    instanceOf(c1, c2) && instanceOf(c2, c1)
 
-  def instanceOf(t1: Expr, t2: Expr): Boolean = (t1.size >= t2.size) && (findSubst(t2, t1).isDefined)
+  def instanceOf(t1: Expr, t2: Expr): Boolean =
+    (t1.size >= t2.size) && findSubst(t2, t1).isDefined
 
   def findSubst(from: Expr, to: Expr): Option[Subst[Expr]] =
     walk((from, to), Map())
@@ -73,20 +84,26 @@ object SLLSyntax {
     case _ => None
   }
 
-  private def walk1(ps: List[(Expr, Expr)], s: Subst[Expr]) =
-    ps.foldLeft[Option[Subst[Expr]]](Some(s)) { (s, p) => s.flatMap { walk(p, _) } }
+  private def walk1(ps: List[(Expr, Expr)], s: Subst[Expr]): Option[Subst[Expr]] =
+    ps.foldLeft[Option[Subst[Expr]]](Some(s)) { (s, p) =>
+      s.flatMap {
+        walk(p, _)
+      }
+    }
 
 }
 
-trait SLLDriving extends PFPTransformer[Expr]
-  with Reducer { this: DriveSteps[Expr] =>
+trait SLLDriving extends PFPTransformer[Expr] with Reducer {
+  this: DriveSteps[Expr] =>
 
   type R = List[GG]
 
   val program: Program
 
   def drive(g: G): List[G] =
-    decompose(g.current.conf) map { _(g) }
+    decompose(g.current.conf) map {
+      _ (g)
+    }
 
   def caseDecLet(let: Let): List[GG] = {
     val (names, es) = let.bindings.unzip
@@ -99,7 +116,9 @@ trait SLLDriving extends PFPTransformer[Expr]
   }
 
   def caseObservableCtr(ctr: Ctr): List[GG] =
-    List(decomposeDriveStep({ Ctr(ctr.name, _: List[Expr]) }, ctr.args))
+    List(decomposeDriveStep({
+      Ctr(ctr.name, _: List[Expr])
+    }, ctr.args))
 
   def caseObservableVar(v: Var): List[GG] =
     List(stopDriveStep())
@@ -126,7 +145,7 @@ trait SLLDriving extends PFPTransformer[Expr]
           body,
           ((p.args ++ gargs) zip (ctr.args ++ gcall.args.tail)).toMap)
         val contraction = Contraction(v.name, Ctr(p.name, ctr.args))
-        val driven = subst(ctx(reduced), contraction.subst)
+        val driven = subst(ctx(reduced), contraction.subst())
         (driven, contraction)
     }
     List(variantsDriveStep(cases))

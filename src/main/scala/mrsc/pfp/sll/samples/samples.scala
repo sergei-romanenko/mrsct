@@ -6,80 +6,86 @@ import mrsc.pfp.sll._
 
 trait PFPGraphBuilder
   extends BasicGraphBuilder[Expr, DriveInfo[Expr]]
-  with PFPTransformer[Expr]
-  with SLLSyntax
-  with SLLDriving
-  with Folding[Expr]
+    with PFPTransformer[Expr]
+    with SLLSyntax
+    with SLLDriving
+    with Folding[Expr]
 
 class MultiAllRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with AllRebuildings[Expr]
+    with BinaryWhistle[Expr]
+    with AllRebuildings[Expr]
 
 class MultiLowerRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with LowerRebuildingsOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with LowerRebuildingsOnBinaryWhistle[Expr]
 
 class MultiUpperRebuildings(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with UpperRebuildingsOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with UpperRebuildingsOnBinaryWhistle[Expr]
 
 class MultiDoubleRebuildingsOnWhistle(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with DoubleRebuildingsOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with DoubleRebuildingsOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with LowerAllBinaryGensOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with LowerAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiLowerAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with LowerAllBinaryGensOrDriveOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with LowerAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with UpperAllBinaryGensOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with UpperAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiUpperAllBinaryGensOrDrive(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with UpperAllBinaryGensOrDriveOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with UpperAllBinaryGensOrDriveOnBinaryWhistle[Expr]
 
 class MultiDoubleAllBinaryGens(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with DoubleAllBinaryGensOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with DoubleAllBinaryGensOnBinaryWhistle[Expr]
 
 class MultiDoubleMsg(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with DoubleMsgOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with DoubleMsgOnBinaryWhistle[Expr]
 
 class ClassicDangerousGen(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with LowerMsgOrUpperMggOnBinaryWhistle[Expr]
+    with BinaryWhistle[Expr]
+    with LowerMsgOrUpperMggOnBinaryWhistle[Expr]
 
 class ClassicCurrentGen(val program: Program, val ordering: PartialOrdering[Expr])
   extends PFPGraphBuilder
-  with BinaryWhistle[Expr]
-  with MSGCurrentOrDriving[Expr]
+    with BinaryWhistle[Expr]
+    with MSGCurrentOrDriving[Expr]
 
 object Samples {
   //type Transformer1 = Transformer[Expr, DriveInfo[Expr], Extra[Expr]]
 
   def multi1(w: PartialOrdering[Expr])(p: Program) = new MultiAllRebuildings(p, w)
+
   def multi2(w: PartialOrdering[Expr])(p: Program) = new MultiLowerRebuildings(p, w)
+
   def multi3(w: PartialOrdering[Expr])(p: Program) = new MultiUpperRebuildings(p, w)
+
   def multi4(w: PartialOrdering[Expr])(p: Program) = new MultiDoubleRebuildingsOnWhistle(p, w)
+
   def classic1(w: PartialOrdering[Expr])(p: Program) = new ClassicDangerousGen(p, w)
+
   def classic2(w: PartialOrdering[Expr])(p: Program) = new ClassicCurrentGen(p, w)
+
   def classic3(w: PartialOrdering[Expr])(p: Program) = new MultiDoubleMsg(p, w)
 
   private def expand(n: Int, s: String): String = {
@@ -116,13 +122,13 @@ object Samples {
     {
       println("**classic+ up:**")
       val m1 = classic1(HEByCouplingWhistle)(task.program)
-      residuateAndCheck(new GraphGenerator(m1, task.target), task)
+      residuateAndCheck(GraphGenerator(m1, task.target), task)
     }
 
     {
       println("**classic+ down:**")
       val m2 = classic2(HEByCouplingWhistle)(task.program)
-      residuateAndCheck(new GraphGenerator(m2, task.target), task)
+      residuateAndCheck(GraphGenerator(m2, task.target), task)
 
     }
 
@@ -130,12 +136,12 @@ object Samples {
 
     {
       val m3 = classic3(HEByCouplingWhistle)(task.program)
-      residuateAndCheck(new GraphGenerator(m3, task.target), task)
+      residuateAndCheck(GraphGenerator(m3, task.target), task)
     }
 
     {
       val m3 = classic3(HEByCouplingWithRedexWhistle)(task.program)
-      residuateAndCheck(new GraphGenerator(m3, task.target), task)
+      residuateAndCheck(GraphGenerator(m3, task.target), task)
     }
 
     println()

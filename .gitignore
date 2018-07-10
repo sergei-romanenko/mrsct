@@ -1,7 +1,8 @@
 /.cache
 /.scala_dependencies
 /bin
-target/
+/project
+/target
 /.idea
 /mrsc.iml
 /.project

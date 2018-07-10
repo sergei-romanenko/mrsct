@@ -24,12 +24,12 @@ trait CounterTransformer
   with SimpleInstanceFoldingToAny[Conf, Int]
   with SimpleUnaryWhistle[Conf, Int]
 
-case class CounterSingleResultTransformer(val protocol: Protocol, val l: Int)
+case class CounterSingleResultTransformer(protocol: Protocol, l: Int)
   extends CounterTransformer
   with LGen
   with SimpleCurrentGensOnWhistle[Conf, Int]
 
-case class CounterMultiResultTransformer(val protocol: Protocol, val l: Int)
+case class CounterMultiResultTransformer(protocol: Protocol, l: Int)
   extends CounterTransformer
   with ProtocolSafetyAware
   with SimpleGensWithUnaryWhistle[Conf, Int]
@@ -60,7 +60,7 @@ object CounterSamples extends App {
     val graphs = GraphGenerator(transformer, protocol.start)
     val successGraphs = graphs filter (_.isComplete) map Transformations.transpose
     //val successGraphs = tgraphs.filter { g => checkSubTree(protocol.unsafe)(g.root) }
-    if (!successGraphs.isEmpty) {
+    if (successGraphs.nonEmpty) {
       val minGraph = successGraphs.minBy(graphSize)
       println(minGraph)
     }

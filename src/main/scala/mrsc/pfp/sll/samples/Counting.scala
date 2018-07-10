@@ -50,9 +50,10 @@ object Counting extends App {
     SLLTask("gApp(gRev(xs), gRev(ys))", program),
     SLLTask("gApp(gRev(xs), gRev(xs))", program))
 
-  implicit val exprOrdering: Ordering[Expr] = Ordering.by(_.size)
+  implicit val exprOrdering: Ordering[Expr] = Ordering.by(_.size())
 
-  def sc(gen: Iterator[SGraph[Expr, DriveInfo[Expr]]], limit: Int): Either[CountingResult, CountingResult] = {
+  def sc(gen: Iterator[SGraph[Expr, DriveInfo[Expr]]],
+         limit: Int): Either[CountingResult, CountingResult] = {
     var completed = 0
     var unworkable = 0
     var residuals = TreeSet[Expr]()
@@ -82,13 +83,13 @@ object Counting extends App {
       new MultiDoubleAllBinaryGens(task.program, whistle))
 
     transformers.foreach { m =>
-      val gen = new GraphGenerator(m, task.target)
+      val gen = GraphGenerator(m, task.target)
       val res = sc(gen, limit)
       res match {
-        case Left(res)  => print("- " + (res.completed, res.residuals.size))
-        case Right(res) => print("+ " + (res.completed, res.residuals.size))
+        case Left(res1) => print("- " + (res1.completed, res1.residuals.size))
+        case Right(res1) => print("+ " + (res1.completed, res1.residuals.size))
       }
-      println("\t" + m.getClass().getSimpleName())
+      println("\t" + m.getClass.getSimpleName)
     }
   }
 

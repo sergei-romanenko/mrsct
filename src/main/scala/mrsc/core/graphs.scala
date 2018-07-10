@@ -45,12 +45,12 @@ case class SNode[C, D](
   base: Option[SPath],
   sPath: SPath) {
 
-  lazy val tPath = sPath.reverse
+  lazy val tPath: List[Int] = sPath.reverse
 
   val ancestors: List[SNode[C, D]] =
     if (in == null) List() else in.node :: in.node.ancestors
 
-  override def toString = conf.toString
+  override def toString: String = conf.toString
 }
 
 case class SEdge[C, D](node: SNode[C, D], driveInfo: D)
@@ -69,8 +69,8 @@ case class SGraph[C, D](
   completeLeaves: List[SNode[C, D]],
   completeNodes: List[SNode[C, D]]) {
 
-  val isComplete = incompleteLeaves.isEmpty
-  val current = if (isComplete) null else incompleteLeaves.head
+  val isComplete: Boolean = incompleteLeaves.isEmpty
+  val current: SNode[C, D] = if (isComplete) null else incompleteLeaves.head
 }
 
 object SGraph {
@@ -89,7 +89,7 @@ case class TNode[C, D](
   base: Option[TPath],
   tPath: TPath) {
 
-  lazy val sPath = tPath.reverse
+  lazy val sPath: List[Int] = tPath.reverse
 
   @tailrec
   final def get(relTPath: TPath): TNode[C, D] = relTPath match {
@@ -97,7 +97,7 @@ case class TNode[C, D](
     case i :: rp => outs(i).node.get(rp)
   }
 
-  override def toString = GraphPrettyPrinter.toString(this)
+  override def toString: String = GraphPrettyPrinter.toString(node = this)
 }
 
 /*! The labeled directed edge. `node` is a destination node; `D` is driving info.
@@ -118,7 +118,7 @@ case class TEdge[C, D](node: TNode[C, D], driveInfo: D)
  */
 case class TGraph[C, D](root: TNode[C, D], leaves: List[TNode[C, D]]) {
   def get(tPath: TPath): TNode[C, D] = root.get(tPath)
-  override def toString = root.toString
+  override def toString: String = root.toString
 }
 
 /*! Auxiliary data for transposing a graph into a transposed graph.
@@ -142,7 +142,7 @@ object Transformations {
     val (tNodes, tLeaves) = subTranspose(sortedLevels, leafPathes)
     val nodes = tNodes map { _.node }
     val leaves = tLeaves map { _.node }
-    return TGraph(nodes(0), leaves)
+    TGraph(nodes.head, leaves)
   }
 
   // sub-transposes graph into transposed graph level-by-level
@@ -170,7 +170,7 @@ object Transformations {
         val tmpNodes = ns1 map { n =>
           val children: List[Tmp[C, D]] = allchildren.getOrElse(n.sPath, Nil)
           val edges = children map { tmp => TEdge(tmp.node, tmp.in.driveInfo) }
-          val node = new TNode(n.conf, edges, n.base.map(_.reverse), n.tPath)
+          val node = TNode(n.conf, edges, n.base.map(_.reverse), n.tPath)
           Tmp(node, n.in)
         }
         val tmpLeaves = tmpNodes.filter { tmp => leaves.contains(tmp.node.sPath) }
@@ -199,7 +199,7 @@ object GraphPrettyPrinter {
  */
 object PathOrdering extends Ordering[TPath] {
   @tailrec
-  final def compare(p1: TPath, p2: TPath) =
+  final def compare(p1: TPath, p2: TPath): Int =
     if (p1.length < p2.length) {
       -1
     } else if (p1.length > p2.length) {

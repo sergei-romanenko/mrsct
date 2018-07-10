@@ -3,9 +3,9 @@ package mrsc.pfp
 import mrsc.core._
 
 case class Contraction[+C](v: Name, pat: C) {
-  override def toString =
+  override def toString: Name =
     if (v != null) v + " = " + pat else ""
-  def subst() = Map[Name, C](v -> pat)
+  def subst(): Map[Name, C] = Map(v -> pat)
 }
 
 sealed trait DriveInfo[+C]
@@ -16,10 +16,11 @@ case class DecomposeStepInfo[C](compose: List[C] => C) extends DriveInfo[C] {
   override def toString = ""
 }
 case class VariantsStepInfo[C](contr: Contraction[C]) extends DriveInfo[C] {
-  override def toString = contr.toString
+  override def toString: Name = contr.toString
 }
 
-trait DriveSteps[C] { this: GraphBuilder[C, DriveInfo[C]] =>
+trait DriveSteps[C] {
+  this: GraphBuilder[C, DriveInfo[C]] =>
 
   def transientDriveStep(next: C): GG = {
     val subSteps = List((next, TransientStepInfo)): List[(C, DriveInfo[C])]

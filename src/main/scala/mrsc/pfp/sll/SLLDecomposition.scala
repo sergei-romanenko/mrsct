@@ -3,15 +3,20 @@ package mrsc.pfp.sll
 trait Reducer {
 
   type R
-  
+
   def caseDecLet(let: Let): R
+
   def caseObservableCtr(ctr: Ctr): R
+
   def caseObservableVar(v: Var): R
+
   def caseFRedex(ctx: Ctx, f: FCall): R
+
   def caseGRedexCtr(ctx: Ctx, g: GCall, c: Ctr): R
+
   def caseGRedexVar(ctx: Ctx, g: GCall, v: Var): R
 
-  type Ctx = (Expr => Expr)
+  type Ctx = Expr => Expr
 
   def decompose(t: Expr): R = (t: @unchecked) match {
     case l: Let => caseDecLet(l)

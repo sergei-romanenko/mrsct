@@ -23,7 +23,7 @@ private class SLLInterpreter(program: Program)
 
   @tailrec
   private def lazyEval(e: Expr): Expr = baseLazyEval(e) match {
-    case e1 @ Ctr(_, _) => e1
+    case e1@Ctr(_, _) => e1
     case e1 => lazyEval(e1)
   }
 
@@ -32,7 +32,7 @@ private class SLLInterpreter(program: Program)
   def caseDecLet(let: Let): Expr =
     throw new Error("unexpected expression: " + let)
 
-  def caseObservableCtr(ctr: Ctr) = ctr
+  def caseObservableCtr(ctr: Ctr): Ctr = ctr
 
   def caseObservableVar(v: Var) =
     throw new Error("unexpected expression: " + v)

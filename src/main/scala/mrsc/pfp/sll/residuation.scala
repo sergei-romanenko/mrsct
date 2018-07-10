@@ -25,7 +25,7 @@ object SLLResiduator extends Residuation[Expr] {
 
   def fold(graph: TGraph[Expr, DriveInfo[Expr]], n: TNode[Expr, DriveInfo[Expr]]): Expr = n.base match {
     // base node
-    case None if (graph.leaves.exists { _.base == Some(n.tPath) }) =>
+    case None if graph.leaves.exists(_.base.contains(n.tPath)) =>
       val (f, vars) = signature(n)
       val call = FCall(f, vars)
       val body = build(graph, n)
@@ -43,13 +43,13 @@ object SLLResiduator extends Residuation[Expr] {
 
   def build(tree: TGraph[Expr, DriveInfo[Expr]], n: TNode[Expr, DriveInfo[Expr]]): Expr = n.outs match {
     case Nil => n.conf
-    case children @ (n1 :: ns) => n1.driveInfo match {
+    case children @ n1 :: ns => n1.driveInfo match {
       case TransientStepInfo =>
         fold(tree, n1.node)
       case DecomposeStepInfo(compose) =>
         compose(children map { _.node } map { fold(tree, _) })
       case VariantsStepInfo(_) =>
-        val (fname, vs @ (v :: vars1)) = gSignature(n)
+        val (fname, vs @ v :: vars1) = gSignature(n)
         val branches = children map { e =>
           val VariantsStepInfo(Contraction(v, c @ Ctr(cn, _))) = e.driveInfo
           val pat = Pat(cn, vars(c) map { _.name })

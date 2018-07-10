@@ -7,16 +7,16 @@ object SLLTasks {
   val peanoProgram: Program =
     """
     gEq(S(x), y) = gEqS(y, x);
-	gEq(Z(), y) = gEqZ(y);
+	  gEq(Z(), y) = gEqZ(y);
 
-	gEqZ(S(x)) = False();
+	  gEqZ(S(x)) = False();
     gEqZ(Z()) = True();
 	  
     gEqS(S(y), x) = gEq(x, y);
     gEqS(Z(), x) = False();
     
     gAdd(S(x), y) = S(gAdd(x, y));
-	gAdd(Z(), y) = y;
+	  gAdd(Z(), y) = y;
     
     gMult(S(x), y) = gAdd(y, gMult(x, y));
     gMult(Z(), y) = Z();
@@ -93,24 +93,24 @@ object SLLTasks {
       "FastReverse" -> SLLTask("gFRev(xs, Nil())", listProgram),
       "NaiveFib" -> SLLTask("gFib(m)", peanoProgram),
       "FastFib" -> SLLTask("gFastFib(m, S(Z()), S(Z()))", peanoProgram),
-      
+
       "EqPlus" -> SLLTask("gEq(gAdd(m, n), gAdd(n, m))", peanoProgram),
       "EqPlusa" -> SLLTask("gEq(gAdd(m, n), gAdd(p, m))", peanoProgram),
       "EqPlusb" -> SLLTask("gEq(gAdd(m, n), gAdd(n, q))", peanoProgram),
       "EqPlusc" -> SLLTask("gEq(gAdd(m, n), gAdd(p, q))", peanoProgram),
-      
+
       "EqPlus1" -> SLLTask("gEq(gAdd(m, S(n)), gAdd(n, S(m)))", peanoProgram),
       "EqPlus1a" -> SLLTask("gEq(gAdd(m, S(p)), gAdd(n, S(m)))", peanoProgram),
       "EqPlus1b" -> SLLTask("gEq(gAdd(m, S(n)), gAdd(n, S(q)))", peanoProgram),
       "EqPlus1c" -> SLLTask("gEq(gAdd(m, S(p)), gAdd(n, S(q)))", peanoProgram),
-      
+
       "OddEven" -> SLLTask("gOr(gEven(m), gOdd(m))", peanoProgram),
       "LastDouble" -> SLLTask("gLast(gApp(xs, xs))", listProgram),
       "App" -> SLLTask("gApp(xs, xs)", listProgram),
       "EvenMult" -> SLLTask("gEven(gMult(m, n))", peanoProgram),
       "EvenSqr" -> SLLTask("gEven(gMult(m, m))", peanoProgram),
       "Idle" -> SLLTask("gIdle(xs)", listProgram))
-      
-   val task1 = SLLTask("gFib(S(S(S(S(S(S(Z())))))))", peanoProgram)
-   val task2 = SLLTask("gRev(Cons(A(), Cons(B(), Cons(C(), Nil()))))", listProgram)
+
+  val task1 = SLLTask("gFib(S(S(S(S(S(S(Z())))))))", peanoProgram)
+  val task2 = SLLTask("gRev(Cons(A(), Cons(B(), Cons(C(), Nil()))))", listProgram)
 }

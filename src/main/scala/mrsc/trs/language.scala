@@ -2,7 +2,9 @@ package mrsc.trs
 
 trait TRSSyntax[C] {
   def rebuildings(c: C): List[C]
-  def equiv(c1: C, c2: C): Boolean 
+
+  def equiv(c1: C, c2: C): Boolean
+
   def instanceOf(c1: C, c2: C): Boolean
 }
 
