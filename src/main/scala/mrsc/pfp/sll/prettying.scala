@@ -1,5 +1,6 @@
 package mrsc.pfp.sll
 
+/*
 object PrettySLL extends org.kiama.output.PrettyPrinter {
   def pretty(t: Expr) = super.pretty(show(t), 12)
 
@@ -18,5 +19,12 @@ object PrettySLL extends org.kiama.output.PrettyPrinter {
 
     case _ => text(e.toString)
   }
+
+}
+*/
+
+object PrettySLL {
+
+  def pretty(t: Expr) = t.toString
 
 }
