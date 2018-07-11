@@ -91,7 +91,7 @@ object SyntaxNormalization {
     def vn(x: Int): Name = "v." + x
 
     def fixBoundVars(e: Expr, m: ListMap[Name, Int]): Expr = (e: @unchecked) match {
-      case Var(n) => m.get(n).map(v).getOrElse(n)
+      case Var(n) => m.get(n).map(v).getOrElse(Var(n))
       case Ctr(n, args) => Ctr(n, args map {
         fixBoundVars(_, m)
       })
@@ -101,25 +101,22 @@ object SyntaxNormalization {
       case GCall(n, args) => GCall(n, args map {
         fixBoundVars(_, m)
       })
-      case Where(e, defs) => {
+      case Where(e1, defs) =>
         val next = m.lastOption.map(_._2).getOrElse(0) + 1
         val defs1 = defs map {
-          case FFun(name, args, body) => {
+          case FFun(name, args, body) =>
             val args1 = args.zipWithIndex map { case (k, v) => (k, next + v) }
             val m1 = m ++ args1
             val body1 = fixBoundVars(body, m1)
             FFun(name, args map m1.andThen(vn), body1)
-          }
-          case GFun(name, Pat(n, pargs), args, body) => {
+          case GFun(name, Pat(n, pargs), args, body) =>
             val delta = (pargs ++ args).zipWithIndex map { case (k, v) => (k, next + v) }
             val m1 = m ++ delta
             val body1 = fixBoundVars(body, m1)
             GFun(name, Pat(n, pargs map m1.andThen(vn)), args map m1.andThen(vn), body1)
-          }
         }
-        val e1 = fixBoundVars(e, m)
-        Where(e1, defs1)
-      }
+        val e2 = fixBoundVars(e1, m)
+        Where(e2, defs1)
     }
 
     def fixDefFs(deff: Def): Def = deff match {
@@ -147,11 +144,10 @@ object SyntaxNormalization {
       case Ctr(n, args) => Ctr(n, args map fixFs)
       case FCall(n, args) => FCall(fmap(n), args map fixFs)
       case GCall(n, args) => GCall(fmap(n), args map fixFs)
-      case Where(e, defs) => {
+      case Where(e1, defs) =>
         val defs1 = defs map fixDefFs
-        val e1 = fixFs(e)
-        Where(e1, defs1)
-      }
+        val e2 = fixFs(e1)
+        Where(e2, defs1)
     }
 
     val fixed1 = fixBoundVars(e, ListMap.empty)

@@ -10,7 +10,7 @@ object Counting extends App {
 
   case class CountingResult(completed: Int, residuals: Set[Expr])
 
-  val program: Program =
+  val program: String =
     """
     gApp(Cons(u, us), vs) = Cons(u, gApp(us, vs));
     gApp(Nil(), vs) = vs;
@@ -50,7 +50,7 @@ object Counting extends App {
     SLLTask("gApp(gRev(xs), gRev(ys))", program),
     SLLTask("gApp(gRev(xs), gRev(xs))", program))
 
-  implicit val exprOrdering: Ordering[Expr] = Ordering.by(_.size())
+  implicit val exprOrdering: Ordering[Expr] = Ordering.by(_.size)
 
   def sc(gen: Iterator[SGraph[Expr, DriveInfo[Expr]]],
          limit: Int): Either[CountingResult, CountingResult] = {

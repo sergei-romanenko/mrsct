@@ -22,7 +22,7 @@ trait SLLSyntax extends PFPSyntax[Expr] {
   override def findSubst(from: Expr, to: Expr): Option[Subst[Expr]] =
     SLLSyntax.findSubst(from, to)
 
-  override def size(e: Expr): Int = e.size()
+  override def size(e: Expr): Int = e.size
 
   override val subclass: SimplePartialOrdering[Expr] =
     (c1: Expr, c2: Expr) => SLLSyntax.instanceOf(c1, c2)
@@ -48,8 +48,10 @@ object SLLSyntax {
   }
 
   private def subst(deff: Def, m: Subst[Expr]): Def = deff match {
-    case FFun(n, xs, e) => FFun(n, xs, subst(e, m -- xs))
-    case GFun(n, Pat(pn, xs), ys, e) => GFun(n, Pat(pn, xs), ys, subst(e, m -- xs -- ys))
+    case FFun(n, xs, e) =>
+      FFun(n, xs, subst(e, m -- xs))
+    case GFun(n, Pat(pn, xs), ys, e) =>
+      GFun(n, Pat(pn, xs), ys, subst(e, m -- xs -- ys))
   }
 
   private def vs(t: Expr): List[Var] = t match {

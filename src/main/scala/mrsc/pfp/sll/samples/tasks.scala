@@ -4,7 +4,7 @@ import mrsc.pfp.sll._
 
 object SLLTasks {
 
-  val peanoProgram: Program =
+  val peanoProgram: String =
     """
     gEq(S(x), y) = gEqS(y, x);
 	  gEq(Z(), y) = gEqZ(y);
@@ -43,7 +43,7 @@ object SLLTasks {
     gOr(True(), x) = True();
 	"""
 
-  val listProgram: Program =
+  val listProgram: String =
     """
     
     gApp(Cons(u, us), vs) = Cons(u, gApp(us, vs));
