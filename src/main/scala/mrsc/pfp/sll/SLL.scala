@@ -76,17 +76,17 @@ case class GFun(name: String, p: Pat, args: List[Name], term: Expr) extends Def 
 
 case class Program(defs: List[Def]) {
   val f: Map[String, FFun] =
-    (defs :\ Map[String, FFun]()) {
+    (defs foldRight Map[String, FFun]()) {
       case (x: FFun, m) => m + (x.name -> x)
       case (_, m) => m
     }
   val g: Map[(String, String), GFun] =
-    (defs :\ Map[(String, String), GFun]()) {
+    (defs foldRight Map[(String, String), GFun]()) {
       case (x: GFun, m) => m + ((x.name, x.p.name) -> x)
       case (_, m) => m
     }
   val gs: Map[String, List[GFun]] =
-    (defs :\ Map[String, List[GFun]]().withDefaultValue(Nil)) {
+    (defs foldRight Map[String, List[GFun]]().withDefaultValue(Nil)) {
       case (x: GFun, m) => m + (x.name -> (x :: m(x.name)))
       case (_, m) => m
     }

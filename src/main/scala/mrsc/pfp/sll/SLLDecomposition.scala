@@ -26,14 +26,15 @@ trait Reducer {
     case g: GCall => decomposeGCall(t => t, g)
   }
 
-  private def decomposeGCall(ctx: Ctx, g: GCall): R = (g.args.head: @unchecked) match {
-    case c: Ctr =>
-      caseGRedexCtr(ctx, g, c)
-    case v: Var =>
-      caseGRedexVar(ctx, g, v)
-    case f: FCall =>
-      caseFRedex(f => ctx(GCall(g.name, f :: g.args.tail)), f)
-    case g1: GCall =>
-      decomposeGCall(g1 => ctx(GCall(g.name, g1 :: g.args.tail)), g1)
-  }
+  private def decomposeGCall(ctx: Ctx, g: GCall): R =
+    (g.args.head: @unchecked) match {
+      case c0: Ctr =>
+        caseGRedexCtr(ctx, g, c0)
+      case v0: Var =>
+        caseGRedexVar(ctx, g, v0)
+      case f0: FCall =>
+        caseFRedex(f1 => ctx(GCall(g.name, f1 :: g.args.tail)), f0)
+      case g0: GCall =>
+        decomposeGCall(g1 => ctx(GCall(g.name, g1 :: g.args.tail)), g0)
+    }
 }

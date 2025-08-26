@@ -3,8 +3,10 @@
 /bin
 /project
 /target
-/.idea
 /mrsc.iml
+/.bsp
+/.idea
+/.metals
 /.project
 /.classpath
 /.settings

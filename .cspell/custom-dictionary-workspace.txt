@@ -1,0 +1,10 @@
+# Custom Dictionary Words
+combinators
+kiama
+mrsc
+mrsct
+scalac
+scalacheck
+scalactic
+scalatest
+Yrangepos

@@ -1,5 +1,6 @@
-package mrsc.sll.test
+// package mrsc.sll.test
 
+/*
 import mrsc.pfp.sll._
 
 import org.scalacheck.{ Gen => G, _ }
@@ -11,8 +12,7 @@ import SLLSyntax._
 
 // Could not run test mrsc.sll.test.GenSpec: java.lang.NoClassDefFoundError: scala/Left
 
-/*
-object GenSpec extends Properties("Generalizaions") {
+object GenSpec extends Properties("Generalizations") {
 
   property("generalizations") = Prop.forAll { (e: Expr) =>
     println(e)

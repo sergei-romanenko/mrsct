@@ -2,7 +2,7 @@ name := "mrsct"
 
 version := "0.1.0"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.20"
 
 resolvers ++= Seq("snapshots", "releases").map(Resolver.sonatypeRepo)
 
@@ -18,7 +18,7 @@ libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
-//libraryDependencies += "com.googlecode.kiama" %% "kiama" % "1.5.2"
+libraryDependencies += "org.bitbucket.inkytonik.kiama" %% "kiama" % "2.5.1"
 
 libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.9" % "test"
 
