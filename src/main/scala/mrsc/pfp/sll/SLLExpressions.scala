@@ -108,12 +108,12 @@ object SyntaxNormalization {
             val args1 = args.zipWithIndex map { case (k, v) => (k, next + v) }
             val m1 = m ++ args1
             val body1 = fixBoundVars(body, m1)
-            FFun(name, args map m1.andThen(vn), body1)
+            FFun(name, args map m1.andThen(vn _), body1)
           case GFun(name, Pat(n, pargs), args, body) =>
             val delta = (pargs ++ args).zipWithIndex map { case (k, v) => (k, next + v) }
             val m1 = m ++ delta
             val body1 = fixBoundVars(body, m1)
-            GFun(name, Pat(n, pargs map m1.andThen(vn)), args map m1.andThen(vn), body1)
+            GFun(name, Pat(n, pargs map m1.andThen(vn _)), args map m1.andThen(vn _), body1)
         }
         val e2 = fixBoundVars(e1, m)
         Where(e2, defs1)

@@ -1,18 +1,18 @@
+scalaVersion := "2.13.16"
+
 name := "mrsct"
 
 version := "0.1.0"
 
-scalaVersion := "2.12.20"
+resolvers += Resolver.sonatypeCentralSnapshots
 
-resolvers ++= Seq("snapshots", "releases").map(Resolver.sonatypeRepo)
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.18"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
@@ -20,14 +20,14 @@ scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
 libraryDependencies += "org.bitbucket.inkytonik.kiama" %% "kiama" % "2.5.1"
 
-libraryDependencies += "org.specs2" %% "specs2-core" % "3.8.9" % "test"
+libraryDependencies += "org.specs2" %% "specs2-core" % "4.21.0" % "test"
 
-libraryDependencies += "org.specs2" %% "specs2-junit" % "3.8.9" % "test"
+libraryDependencies += "org.specs2" %% "specs2-junit" % "4.21.0" % "test"
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+Test / scalacOptions ++= Seq("-Yrangepos")
 
-testOptions in Test += Tests.Argument("-oD")
+Test / testOptions += Tests.Argument("-oD")
 
-logBuffered in Test := false
+Test / logBuffered := false
 
-parallelExecution in Test := false
+Test / parallelExecution := false

@@ -199,7 +199,8 @@ object Samples {
     transformers foreach { m =>
       val gen = GraphGenerator(m, task.target)
       val (completed, unworkable) = count(gen)
-      val res = expandRight(12, completed + "/" + unworkable)
+      // val res = expandRight(12, completed + "/" + unworkable)
+      val res = expandRight(12, s"${completed}/${unworkable}")
       print(res)
     }
 

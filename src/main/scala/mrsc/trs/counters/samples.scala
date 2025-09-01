@@ -46,11 +46,11 @@ object CounterSamples extends App {
     val graphs = GraphGenerator(transformer, protocol.start)
 
     for (graph <- graphs if graph.isComplete) {
-      val tgraph = Transformations.transpose(graph)
+      val tGraph = Transformations.transpose(graph)
       println("================================")
       println()
-      println(tgraph)
-      val isSafe = checkSubTree(protocol.unsafe)(tgraph.root)
+      println(tGraph)
+      val isSafe = checkSubTree(protocol.unsafe)(tGraph.root)
       println(isSafe)
     }
   }
@@ -59,7 +59,7 @@ object CounterSamples extends App {
     val transformer = CounterMultiResultTransformer(protocol, l)
     val graphs = GraphGenerator(transformer, protocol.start)
     val successGraphs = graphs filter (_.isComplete) map Transformations.transpose
-    //val successGraphs = tgraphs.filter { g => checkSubTree(protocol.unsafe)(g.root) }
+    //val successGraphs = tGraphs.filter { g => checkSubTree(protocol.unsafe)(g.root) }
     if (successGraphs.nonEmpty) {
       val minGraph = successGraphs.minBy(graphSize)
       println(minGraph)

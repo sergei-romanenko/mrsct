@@ -109,7 +109,7 @@ trait SLLDriving extends PFPTransformer[Expr] with Reducer {
 
   def caseDecLet(let: Let): List[GG] = {
     val (names, es) = let.bindings.unzip
-    val compose = { parts: List[Expr] =>
+    val compose = { (parts: List[Expr]) =>
       val in :: binds = parts
       val sub = (names zip binds).toMap
       subst(in, sub)

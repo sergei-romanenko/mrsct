@@ -61,7 +61,7 @@ sealed abstract class Def {
 
   def rhs: Expr
 
-  override def toString: Name = lhs + " = " + rhs + ";"
+  override def toString: Name = s"${lhs} = ${rhs};"
 }
 
 case class FFun(name: String, args: List[Name], term: Expr) extends Def {
@@ -95,7 +95,8 @@ case class Program(defs: List[Def]) {
 }
 
 case class SLLTask(target: Expr, program: Program) {
-  override def toString: Name = target + "\n" + program
+  // override def toString: Name = target + "\n" + program
+  override def toString: Name = s"${target}\n${program}"
 }
 
 object SLLTask {
@@ -104,7 +105,7 @@ object SLLTask {
 }
 
 object SLLParsers extends StandardTokenParsers with ImplicitConversions {
-  lexical.delimiters += ("(", ")", ",", "=", ";")
+  lexical.delimiters.addAll(List("(", ")", ",", "=", ";"))
 
   def prog: SLLParsers.Parser[List[Def]] = rep1(definition)
 

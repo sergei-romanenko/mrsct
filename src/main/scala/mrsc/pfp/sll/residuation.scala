@@ -49,9 +49,9 @@ object SLLResiduator extends Residuation[Expr] {
       case DecomposeStepInfo(compose) =>
         compose(children map { _.node } map { fold(tree, _) })
       case VariantsStepInfo(_) =>
-        val (fname, vs @ v :: vars1) = gSignature(n)
+        val (fname, vs @ v :: vars1) = gSignature(n) : @unchecked
         val branches = children map { e =>
-          val VariantsStepInfo(Contraction(v, c @ Ctr(cn, _))) = e.driveInfo
+          val VariantsStepInfo(Contraction(v, c @ Ctr(cn, _))) = e.driveInfo : @unchecked
           val pat = Pat(cn, vars(c) map { _.name })
           GFun(fname, pat, vars1 map { _.name }, fold(tree, e.node))
         } sortBy (_.p.name)

@@ -46,7 +46,7 @@ trait UnaryWhistle[C] extends PFPTransformer[C] {
   def dangerous(c: C): Boolean
 
   override def inspect(g: G): Option[Warning] =
-    if (dangerous(g.current.conf)) Some(Unit) else None
+    if (dangerous(g.current.conf)) Some(()) else None
 }
 
 trait AllRebuildings[C] extends PFPTransformer[C] with PFPSyntax[C] {

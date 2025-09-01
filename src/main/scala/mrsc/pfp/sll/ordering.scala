@@ -18,11 +18,11 @@ object HE {
   def heByCoupling(t1: Expr, t2: Expr): Boolean =
     (t1.size <= t2.size) && ((t1, t2) match {
       case (Ctr(n1, args1), Ctr(n2, args2)) =>
-        n1 == n2 && (args1, args2).zipped.forall(he)
+        n1 == n2 && args1.lazyZip(args2).forall(he)
       case (FCall(n1, args1), FCall(n2, args2)) =>
-        n1 == n2 && (args1, args2).zipped.forall(he)
+        n1 == n2 && args1.lazyZip(args2).forall(he)
       case (GCall(n1, args1), GCall(n2, args2)) =>
-        n1 == n2 && (args1, args2).zipped.forall(he)
+        n1 == n2 && args1.lazyZip(args2).forall(he)
       case (Var(_), Var(_)) =>
         true
       case _ => false

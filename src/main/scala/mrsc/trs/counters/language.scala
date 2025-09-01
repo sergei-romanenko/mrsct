@@ -50,11 +50,11 @@ trait CountersSyntax extends TRSSyntax[Conf] {
   def rebuildings(c: Conf): List[List[Expr]] = CountersSyntax.rebuildings(c)
 }
 
-object CountersSyntax extends {
+object CountersSyntax extends TRSSyntax[Conf] {
   def equiv(c1: Conf, c2: Conf): Boolean = c1 == c2
 
   def instanceOf(c1: Conf, c2: Conf): Boolean =
-    (c1, c2).zipped.forall(instanceOf)
+    c1.lazyZip(c2).forall(instanceOf)
 
   def instanceOf(x: Expr, y: Expr): Boolean = (x, y) match {
     case (_, Omega) => true

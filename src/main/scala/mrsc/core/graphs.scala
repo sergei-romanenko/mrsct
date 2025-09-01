@@ -136,10 +136,10 @@ object Transformations {
     val orderedNodes = g.completeNodes.sortBy(_.sPath)(PathOrdering)
     val rootNode = orderedNodes.head
 
-    val leafPathes = g.completeLeaves.map(_.sPath)
+    val leafPaths = g.completeLeaves.map(_.sPath)
     val levels = orderedNodes.groupBy(_.sPath.length).toList.sortBy(_._1).map(_._2)
     val sortedLevels = levels.map(_.sortBy(_.tPath)(PathOrdering))
-    val (tNodes, tLeaves) = subTranspose(sortedLevels, leafPathes)
+    val (tNodes, tLeaves) = subTranspose(sortedLevels, leafPaths)
     val nodes = tNodes map { _.node }
     val leaves = tLeaves map { _.node }
     TGraph(nodes.head, leaves)
@@ -166,9 +166,9 @@ object Transformations {
 
       case ns1 :: ns => {
         val (allCh, leaves1) = subTranspose(ns, leaves)
-        val allchildren = allCh.groupBy { _.node.sPath.tail }
+        val allChildren = allCh.groupBy { _.node.sPath.tail }
         val tmpNodes = ns1 map { n =>
-          val children: List[Tmp[C, D]] = allchildren.getOrElse(n.sPath, Nil)
+          val children: List[Tmp[C, D]] = allChildren.getOrElse(n.sPath, Nil)
           val edges = children map { tmp => TEdge(tmp.node, tmp.in.driveInfo) }
           val node = TNode(n.conf, edges, n.base.map(_.reverse), n.tPath)
           Tmp(node, n.in)

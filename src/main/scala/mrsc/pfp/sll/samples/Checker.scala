@@ -50,7 +50,7 @@ object Checker {
       for (value <- ss1; sub <- ss2) yield sub + (v -> value)
   }
   
-  def check(t1: SLLTask, t2: SLLTask) {
+  def check(t1: SLLTask, t2: SLLTask) = {
     val vs = vars(t1.target)
     val ss = subs(vs)
     for (sub <- ss) {
